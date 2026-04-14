@@ -11,7 +11,7 @@ services:
     plan: free
     runtime: node
     rootDir: .
-    buildCommand: npm install && npm run build -w server && npx prisma generate && npx prisma migrate deploy
+    buildCommand: npm install --include=dev && npx prisma generate && npm run build -w server && npx prisma migrate deploy
     startCommand: npm run start -w server
     envVars:
       - key: NODE_ENV
@@ -39,7 +39,7 @@ services:
     plan: free
     runtime: node
     rootDir: .
-    buildCommand: npm install && npm run build -w web
+    buildCommand: npm install --include=dev && npm run build -w web
     startCommand: npm run start -w web
     envVars:
       - key: NODE_ENV
