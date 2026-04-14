@@ -12,7 +12,7 @@ services:
     runtime: node
     rootDir: .
     buildCommand: npm install --include=dev && npx prisma generate && npm run build -w server && npx prisma migrate deploy
-    startCommand: npm run start -w server
+    startCommand: node server/dist/index.js
     envVars:
       - key: NODE_ENV
         value: production
