@@ -11,14 +11,15 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
+    const backendUrl = process.env.BACKEND_URL ?? "http://localhost:4000";
     return [
       {
         source: "/api/v1/:path*",
-        destination: "http://localhost:4000/api/v1/:path*",
+        destination: `${backendUrl}/api/v1/:path*`,
       },
       {
         source: "/uploads/:path*",
-        destination: "http://localhost:4000/uploads/:path*",
+        destination: `${backendUrl}/uploads/:path*`,
       },
     ];
   },
