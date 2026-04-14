@@ -13,7 +13,7 @@ RUN npm install --include=dev
 RUN npx prisma generate
 RUN npm run build -w server
 # The TS compiler mangles the generated prisma client — replace with originals
-RUN rm -rf server/dist/generated && mkdir -p server/dist/generated && cp -r generated/prisma server/dist/generated/prisma
+RUN rm -rf server/dist/generated && mkdir -p server/dist/generated && cp -r generated/prisma server/dist/generated/prisma && echo '{"type":"commonjs"}' > server/dist/generated/prisma/package.json
 
 EXPOSE 8080
 CMD node server/dist/server/src/index.js
