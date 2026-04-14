@@ -14,4 +14,4 @@ RUN npx prisma generate
 RUN npm run build -w server
 
 EXPOSE 8080
-CMD npx prisma migrate deploy && node server/dist/server/src/index.js
+CMD node server/dist/server/src/index.js
