@@ -12,8 +12,9 @@ async function main() {
   const server = http.createServer(app);
   initSocket(server);
 
-  server.listen(config.port, () => {
-    console.log(`✓ Server running on http://localhost:${config.port}`);
+  const port = parseInt(process.env.PORT ?? String(config.port), 10);
+  server.listen(port, () => {
+    console.log(`✓ Server running on http://localhost:${port}`);
   });
 
   const shutdown = async () => {
