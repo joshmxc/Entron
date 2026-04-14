@@ -1,0 +1,32 @@
+{
+  "name": "entron",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w web\"",
+    "build": "npm run build -w server && npm run build -w web",
+    "db:migrate": "prisma migrate dev --schema=prisma/schema.prisma",
+    "db:generate": "prisma generate",
+    "db:seed": "ts-node prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "db:push": "prisma db push"
+  },
+  "devDependencies": {
+    "@prisma/adapter-pg": "^7.7.0",
+    "@types/node": "^25.5.2",
+    "bcryptjs": "^3.0.3",
+    "concurrently": "^9.1.2",
+    "dotenv": "^17.4.1",
+    "pg": "^8.20.0",
+    "prisma": "^7.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.7.0"
+  }
+}

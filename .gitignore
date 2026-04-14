@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.next/
+generated/
+uploads/
+.env
+.env.local
+.env*.local
+*.log
+.DS_Store
+.claude/
+web/certificates/
+web/tsconfig.tsbuildinfo
+

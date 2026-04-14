@@ -1,0 +1,128 @@
+{
+  "app": { "name": "Entron", "tagline": "Event Guest Management" },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "phone": "Phone Number",
+    "password": "Password",
+    "loginTitle": "Sign in to Entron",
+    "loginError": "Invalid phone or password"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "events": "Events",
+    "guests": "Guests",
+    "scanner": "Scanner",
+    "invitations": "Invitations",
+    "payments": "Contributions",
+    "staff": "Staff",
+    "settings": "Settings"
+  },
+  "events": {
+    "title": "Events",
+    "create": "New Event",
+    "name": "Event Name",
+    "venue": "Venue",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "guests": "Guests",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "noEvents": "No events yet"
+  },
+  "guests": {
+    "title": "Guests",
+    "add": "Add Guest",
+    "import": "Import Excel",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone",
+    "table": "Table",
+    "seat": "Seat",
+    "type": "Ticket Type",
+    "admissions": "Admissions",
+    "checkedIn": "Checked In",
+    "notCheckedIn": "Not Checked In",
+    "search": "Search guests...",
+    "noGuests": "No guests found",
+    "types": {
+      "SINGLE": "Single",
+      "DOUBLE": "Double",
+      "FAMILY": "Family",
+      "VIP": "VIP"
+    }
+  },
+  "scanner": {
+    "title": "Scanner",
+    "scanning": "Scanning...",
+    "point": "Point camera at QR code",
+    "valid": "VALID",
+    "invalid": "INVALID",
+    "alreadyScanned": "Already Scanned",
+    "limitReached": "Limit Reached",
+    "wrongEvent": "Wrong Event",
+    "invalidQR": "Invalid QR Code",
+    "welcome": "Welcome!",
+    "admissions": "Admission",
+    "of": "of",
+    "tapToContinue": "Tap to continue scanning"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalGuests": "Total Guests",
+    "checkedIn": "Checked In",
+    "attendance": "Attendance",
+    "totalScans": "Total Scans",
+    "validScans": "Valid Scans",
+    "invalidScans": "Invalid Scans",
+    "liveFeed": "Live Scan Feed",
+    "topStaff": "Top Staff",
+    "noActivity": "No activity yet"
+  },
+  "payments": {
+    "title": "Contributions",
+    "tuma": "Send Contribution",
+    "amount": "Amount (TZS)",
+    "phone": "Mobile Number",
+    "provider": "Provider",
+    "status": "Status",
+    "pending": "Pending",
+    "completed": "Completed",
+    "failed": "Failed",
+    "total": "Total Collected"
+  },
+  "invitations": {
+    "title": "Invitations",
+    "upload": "Upload Template",
+    "generate": "Generate Cards",
+    "download": "Download ZIP",
+    "sendWhatsApp": "Send via WhatsApp",
+    "status": {
+      "PENDING": "Pending",
+      "SENT": "Sent",
+      "DELIVERED": "Delivered",
+      "READ": "Read",
+      "FAILED": "Failed"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "confirm": "Are you sure?",
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "export": "Export",
+    "import": "Import"
+  }
+}

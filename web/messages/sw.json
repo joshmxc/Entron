@@ -1,0 +1,128 @@
+{
+  "app": { "name": "Entron", "tagline": "Usimamizi wa Wageni wa Matukio" },
+  "auth": {
+    "login": "Ingia",
+    "logout": "Toka",
+    "phone": "Nambari ya Simu",
+    "password": "Nenosiri",
+    "loginTitle": "Ingia kwenye Entron",
+    "loginError": "Nambari au nenosiri si sahihi"
+  },
+  "nav": {
+    "dashboard": "Dashibodi",
+    "events": "Matukio",
+    "guests": "Wageni",
+    "scanner": "Skana",
+    "invitations": "Mialiko",
+    "payments": "Mchango",
+    "staff": "Wafanyakazi",
+    "settings": "Mipangilio"
+  },
+  "events": {
+    "title": "Matukio",
+    "create": "Tukio Jipya",
+    "name": "Jina la Tukio",
+    "venue": "Mahali",
+    "startDate": "Tarehe ya Kuanza",
+    "endDate": "Tarehe ya Kuisha",
+    "guests": "Wageni",
+    "status": "Hali",
+    "active": "Inafanya Kazi",
+    "inactive": "Haifanyi Kazi",
+    "noEvents": "Hakuna matukio bado"
+  },
+  "guests": {
+    "title": "Wageni",
+    "add": "Ongeza Mgeni",
+    "import": "Ingiza Excel",
+    "firstName": "Jina la Kwanza",
+    "lastName": "Jina la Ukoo",
+    "phone": "Simu",
+    "table": "Meza",
+    "seat": "Kiti",
+    "type": "Aina ya Tiketi",
+    "admissions": "Idadi ya Kuingia",
+    "checkedIn": "Ameingia",
+    "notCheckedIn": "Hajaingia",
+    "search": "Tafuta wageni...",
+    "noGuests": "Hakuna wageni",
+    "types": {
+      "SINGLE": "Mmoja",
+      "DOUBLE": "Wawili",
+      "FAMILY": "Familia",
+      "VIP": "VIP"
+    }
+  },
+  "scanner": {
+    "title": "Skana",
+    "scanning": "Inaskana...",
+    "point": "Elekeza kamera kwenye QR code",
+    "valid": "HALALI",
+    "invalid": "BATILI",
+    "alreadyScanned": "Imeskanwa Tayari",
+    "limitReached": "Kikomo Kimefikiwa",
+    "wrongEvent": "Tukio Tofauti",
+    "invalidQR": "QR Code Si Sahihi",
+    "welcome": "Karibu!",
+    "admissions": "Kuingia",
+    "of": "kati ya",
+    "tapToContinue": "Gusa kuendelea kuskanikisha"
+  },
+  "dashboard": {
+    "title": "Dashibodi",
+    "totalGuests": "Wageni Wote",
+    "checkedIn": "Walioingia",
+    "attendance": "Mahudhurio",
+    "totalScans": "Skani Zote",
+    "validScans": "Skani Halali",
+    "invalidScans": "Skani Batili",
+    "liveFeed": "Skani za Sasa Hivi",
+    "topStaff": "Wafanyakazi Bora",
+    "noActivity": "Hakuna shughuli bado"
+  },
+  "payments": {
+    "title": "Michango",
+    "tuma": "Tuma Mchango",
+    "amount": "Kiasi (TZS)",
+    "phone": "Nambari ya Simu",
+    "provider": "Mtoa Huduma",
+    "status": "Hali",
+    "pending": "Inasubiri",
+    "completed": "Imekamilika",
+    "failed": "Imeshindwa",
+    "total": "Jumla Iliyokusanywa"
+  },
+  "invitations": {
+    "title": "Mialiko",
+    "upload": "Pakia Templeti",
+    "generate": "Tengeneza Kadi",
+    "download": "Pakua ZIP",
+    "sendWhatsApp": "Tuma kupitia WhatsApp",
+    "status": {
+      "PENDING": "Inasubiri",
+      "SENT": "Imetumwa",
+      "DELIVERED": "Imepokelewa",
+      "READ": "Imesomwa",
+      "FAILED": "Imeshindwa"
+    }
+  },
+  "common": {
+    "save": "Hifadhi",
+    "cancel": "Ghairi",
+    "delete": "Futa",
+    "edit": "Hariri",
+    "loading": "Inapakia...",
+    "error": "Kuna hitilafu",
+    "success": "Imefanikiwa",
+    "confirm": "Una uhakika?",
+    "yes": "Ndiyo",
+    "no": "Hapana",
+    "back": "Rudi",
+    "next": "Endelea",
+    "search": "Tafuta",
+    "filter": "Chuja",
+    "all": "Yote",
+    "export": "Hamisha",
+    "import": "Ingiza"
+  }
+}
