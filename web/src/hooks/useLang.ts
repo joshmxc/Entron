@@ -15,7 +15,7 @@ function setCookie(name: string, value: string) {
 }
 
 export function useLang() {
-  const [lang, setLang] = useState<Lang>("sw");
+  const [lang, setLang] = useState<Lang>("en");
   const router = useRouter();
 
   useEffect(() => {

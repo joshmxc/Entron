@@ -4,16 +4,21 @@ import { CheckCircle, XCircle, AlertTriangle, User, Hash } from "lucide-react";
 import { ScanResult as ScanResultType } from "@/store/scanStore";
 import { cn } from "@/lib/utils";
 
+const successAudio = typeof window !== "undefined" ? new Audio("/sounds/success.mp3") : null;
+const errorAudio = typeof window !== "undefined" ? new Audio("/sounds/error.mp3") : null;
+if (successAudio) successAudio.preload = "auto";
+if (errorAudio) errorAudio.preload = "auto";
+
 const TYPE_LABELS: Record<string, string> = {
-  SINGLE: "Mmoja", DOUBLE: "Wawili", FAMILY: "Familia", VIP: "VIP",
+  SINGLE: "Single", DOUBLE: "Double", FAMILY: "Family", VIP: "VIP",
 };
 
 const STATUS_CONFIG: Record<string, { bg: string; icon: React.ElementType; label: string; iconColor: string }> = {
-  SUCCESS: { bg: "bg-green-600", icon: CheckCircle, label: "KARIBU!", iconColor: "text-white" },
-  ALREADY_SCANNED: { bg: "bg-red-600", icon: XCircle, label: "IMESKANWA TAYARI", iconColor: "text-white" },
-  LIMIT_REACHED: { bg: "bg-orange-600", icon: AlertTriangle, label: "KIKOMO KIMEFIKIWA", iconColor: "text-white" },
-  INVALID_QR: { bg: "bg-red-700", icon: XCircle, label: "QR BATILI", iconColor: "text-white" },
-  WRONG_EVENT: { bg: "bg-red-700", icon: XCircle, label: "TUKIO TOFAUTI", iconColor: "text-white" },
+  SUCCESS: { bg: "bg-green-600", icon: CheckCircle, label: "WELCOME!", iconColor: "text-white" },
+  ALREADY_SCANNED: { bg: "bg-red-600", icon: XCircle, label: "ALREADY SCANNED", iconColor: "text-white" },
+  LIMIT_REACHED: { bg: "bg-orange-600", icon: AlertTriangle, label: "LIMIT REACHED", iconColor: "text-white" },
+  INVALID_QR: { bg: "bg-red-700", icon: XCircle, label: "INVALID QR", iconColor: "text-white" },
+  WRONG_EVENT: { bg: "bg-red-700", icon: XCircle, label: "WRONG EVENT", iconColor: "text-white" },
 };
 
 interface Props {
@@ -27,9 +32,12 @@ export default function ScanResult({ result, onDismiss }: Props) {
   const isSuccess = result.status === "SUCCESS";
 
   useEffect(() => {
-    const src = isSuccess ? "/sounds/success.mp3" : "/sounds/error.mp3";
-    const audio = new Audio(src);
-    audio.play().catch(() => {});
+    const audio = isSuccess ? successAudio : errorAudio;
+    if (audio) {
+      audio.currentTime = 0;
+      audio.volume = 1.0;
+      audio.play().catch(() => {});
+    }
   }, [isSuccess]);
 
   return (
@@ -58,14 +66,14 @@ export default function ScanResult({ result, onDismiss }: Props) {
             </span>
             {result.guest.tableNumber && (
               <span className="bg-white/20 text-white text-sm font-semibold px-3 py-1 rounded-full flex items-center gap-1">
-                <Hash className="w-3.5 h-3.5" /> Meza {result.guest.tableNumber}
+                <Hash className="w-3.5 h-3.5" /> Table {result.guest.tableNumber}
               </span>
             )}
           </div>
 
           {isSuccess && (
             <p className="text-white/80 mt-2 text-lg">
-              Kuingia {result.guest.admissionsUsed}/{result.guest.maxAdmissions}
+              Entry {result.guest.admissionsUsed}/{result.guest.maxAdmissions}
             </p>
           )}
         </div>
@@ -75,7 +83,7 @@ export default function ScanResult({ result, onDismiss }: Props) {
         <p className="text-white/70 text-lg mt-4 text-center">{result.message}</p>
       )}
 
-      <p className="absolute bottom-12 text-white/50 text-sm">Gusa kuendelea</p>
+      <p className="absolute bottom-12 text-white/50 text-sm">Tap to continue</p>
     </div>
   );
 }
