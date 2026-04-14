@@ -31,7 +31,7 @@ services:
       - key: SERVER_PORT
         value: 10000
       - key: SERVER_ORIGIN
-        sync: false   # fill in after frontend URL is known
+        sync: false
 
   # ── Frontend (Next.js) ─────────────────────────────────────────
   - type: web
@@ -45,8 +45,4 @@ services:
       - key: NODE_ENV
         value: production
       - key: BACKEND_URL
-        fromService:
-          name: entron-server
-          type: web
-          property: host
-          envVarKey: BACKEND_URL
+        sync: false
