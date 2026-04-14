@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { CheckCircle, XCircle, AlertTriangle, User, Hash } from "lucide-react";
 import { ScanResult as ScanResultType } from "@/store/scanStore";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,12 @@ export default function ScanResult({ result, onDismiss }: Props) {
   const config = STATUS_CONFIG[result.status] ?? STATUS_CONFIG.INVALID_QR;
   const Icon = config.icon;
   const isSuccess = result.status === "SUCCESS";
+
+  useEffect(() => {
+    const src = isSuccess ? "/sounds/success.mp3" : "/sounds/error.mp3";
+    const audio = new Audio(src);
+    audio.play().catch(() => {});
+  }, [isSuccess]);
 
   return (
     <div
