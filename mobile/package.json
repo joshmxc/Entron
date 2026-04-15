@@ -1,0 +1,23 @@
+{
+  "name": "entron-mobile",
+  "version": "1.0.0",
+  "description": "Entron Mobile App",
+  "main": "index.js",
+  "scripts": {
+    "android": "npx cap run android",
+    "ios": "npx cap run ios",
+    "sync": "npx cap sync",
+    "open:android": "npx cap open android",
+    "open:ios": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/ios": "^7.0.0",
+    "@capacitor/status-bar": "^7.0.0",
+    "@capacitor/splash-screen": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0"
+  }
+}

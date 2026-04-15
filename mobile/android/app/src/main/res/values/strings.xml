@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Entron</string>
+    <string name="title_activity_main">Entron</string>
+    <string name="package_name">com.entron.app</string>
+    <string name="custom_url_scheme">com.entron.app</string>
+</resources>
