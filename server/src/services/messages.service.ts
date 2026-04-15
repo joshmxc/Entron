@@ -1,6 +1,7 @@
 import { prisma } from "../lib/prisma";
 import { sendTextMessage } from "../lib/whatsapp";
 import { sendBulkSMS, getSMSBalance } from "../lib/sms";
+import { sendBeemBulkSMS, isBeemConfigured } from "../lib/beem";
 
 const WHATSAPP_DELAY = 60; // ms between WhatsApp messages
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -38,26 +39,51 @@ export async function sendBulkMessages(opts: {
   // Record failures for guests without phone
   noPhone.forEach((g) => {
     results.failed++;
-    results.details.push({ name: `${g.firstName} ${g.lastName}`, phone: "—", status: "Hakuna nambari", channel });
+    results.details.push({ name: `${g.firstName} ${g.lastName}`, phone: "—", status: "No phone number", channel });
   });
 
-  // ── SMS: send as one bulk request ──────────────────────────────────────
+  // ── SMS: prefer Beem if configured, fall back to messaging-service.co.tz ──
   if ((channel === "SMS" || channel === "BOTH") && withPhone.length > 0) {
     try {
       const smsMessages = withPhone.map((g) => ({
         to: g.phone!,
-        text: personalize(message, g.firstName, g.lastName),
+        message: personalize(message, g.firstName, g.lastName),
+        text:    personalize(message, g.firstName, g.lastName), // legacy compat
       }));
 
-      const reference = `entron_${Date.now()}`;
-      const bulkResult = await sendBulkSMS(smsMessages, reference);
+      let bulkResults: { to: string; messageId: string; status: string }[];
 
-      // Save to DB and tally results
+      if (isBeemConfigured()) {
+        // ── Beem Africa ──────────────────────────────────────────────────────
+        const beemResult = await sendBeemBulkSMS(
+          smsMessages.map((m) => ({ to: m.to, message: m.message })),
+          message // global fallback (Beem uses per-recipient messages here)
+        );
+        bulkResults = beemResult.results.map((r) => ({
+          to: r.to,
+          messageId: r.messageId,
+          status: r.status === "SENT" || r.status === "SIMULATED" ? "SENT" : "FAILED",
+        }));
+      } else {
+        // ── messaging-service.co.tz (fallback) ──────────────────────────────
+        const reference = `entron_${Date.now()}`;
+        const legacyResult = await sendBulkSMS(
+          smsMessages.map((m) => ({ to: m.to, text: m.text })),
+          reference
+        );
+        bulkResults = legacyResult.results.map((r) => ({
+          to: r.to,
+          messageId: r.messageId,
+          status: r.status.includes("FAILED") ? "FAILED" : "SENT",
+        }));
+      }
+
+      // Persist results to DB and tally
       for (let i = 0; i < withPhone.length; i++) {
         const guest = withPhone[i];
-        const apiResult = bulkResult.results[i];
-        const body = smsMessages[i].text;
-        const succeeded = apiResult && !apiResult.status.includes("FAILED");
+        const apiResult = bulkResults[i];
+        const body = smsMessages[i].message;
+        const succeeded = apiResult?.status === "SENT";
 
         await prisma.outboundMessage.create({
           data: {
@@ -72,20 +98,21 @@ export async function sendBulkMessages(opts: {
 
         if (succeeded) {
           results.sent++;
-          results.details.push({ name: `${guest.firstName} ${guest.lastName}`, phone: guest.phone!, status: "Imetumwa", channel: "SMS" });
+          results.details.push({ name: `${guest.firstName} ${guest.lastName}`, phone: guest.phone!, status: "Sent", channel: "SMS" });
         } else {
           results.failed++;
-          results.details.push({ name: `${guest.firstName} ${guest.lastName}`, phone: guest.phone!, status: "Imeshindwa", channel: "SMS" });
+          results.details.push({ name: `${guest.firstName} ${guest.lastName}`, phone: guest.phone!, status: "Failed", channel: "SMS" });
         }
       }
     } catch (err) {
-      // Whole batch failed
+      console.error("[SMS] Bulk send error:", err);
+      // Whole batch failed — record all as failed
       for (const guest of withPhone) {
         await prisma.outboundMessage.create({
           data: { sentBy, phone: guest.phone!, body: personalize(message, guest.firstName, guest.lastName), channel: "SMS", status: "FAILED" },
         });
         results.failed++;
-        results.details.push({ name: `${guest.firstName} ${guest.lastName}`, phone: guest.phone!, status: "Imeshindwa", channel: "SMS" });
+        results.details.push({ name: `${guest.firstName} ${guest.lastName}`, phone: guest.phone!, status: "Failed", channel: "SMS" });
       }
     }
   }
@@ -101,13 +128,13 @@ export async function sendBulkMessages(opts: {
           data: { sentBy, phone: guest.phone!, body, channel: "WHATSAPP", externalId, status: "SENT" },
         });
         results.sent++;
-        results.details.push({ name: `${guest.firstName} ${guest.lastName}`, phone: guest.phone!, status: "Imetumwa", channel: "WHATSAPP" });
+        results.details.push({ name: `${guest.firstName} ${guest.lastName}`, phone: guest.phone!, status: "Sent", channel: "WHATSAPP" });
       } catch {
         await prisma.outboundMessage.create({
           data: { sentBy, phone: guest.phone!, body, channel: "WHATSAPP", status: "FAILED" },
         });
         results.failed++;
-        results.details.push({ name: `${guest.firstName} ${guest.lastName}`, phone: guest.phone!, status: "Imeshindwa", channel: "WHATSAPP" });
+        results.details.push({ name: `${guest.firstName} ${guest.lastName}`, phone: guest.phone!, status: "Failed", channel: "WHATSAPP" });
       }
     }
   }

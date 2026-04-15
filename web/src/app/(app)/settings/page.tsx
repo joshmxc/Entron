@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { Globe, Lock, LogOut } from "lucide-react";
+import { Globe, Lock, LogOut, MessageSquare, CheckCircle2, XCircle, Loader2, Phone } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 
@@ -15,6 +15,96 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+// ── Test SMS panel (admin-only) ─────────────────────────────────────────────
+function TestSMSPanel() {
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<{ success: boolean; message: string; simulated?: boolean } | null>(null);
+
+  const handleTest = async () => {
+    if (!phone.trim()) return;
+    setLoading(true);
+    setResult(null);
+    try {
+      const res = await api.post("/sms/test", { phone: phone.trim() });
+      const data = res.data?.data;
+      setResult({
+        success: true,
+        message: data?.simulated
+          ? `Simulated — Beem credentials not set yet. To: ${data?.to}`
+          : `SMS sent! To: ${data?.to} | ID: ${data?.messageId}`,
+        simulated: data?.simulated,
+      });
+    } catch (err: unknown) {
+      const axErr = err as { response?: { data?: { error?: string; detail?: string; hint?: string } } };
+      const detail = axErr.response?.data?.detail ?? axErr.response?.data?.error ?? "SMS failed";
+      const hint = axErr.response?.data?.hint;
+      setResult({ success: false, message: hint ? `${detail} — ${hint}` : detail });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="card space-y-4">
+      <h2 className="font-semibold text-slate-200 flex items-center gap-2">
+        <MessageSquare className="w-4 h-4 text-entron-blue" /> Test SMS (Beem Africa)
+      </h2>
+      <p className="text-xs text-slate-400">
+        Send a test message to verify your Beem credentials are working.
+        Set <code className="bg-slate-700 px-1 rounded">BEEM_API_KEY</code> and{" "}
+        <code className="bg-slate-700 px-1 rounded">BEEM_SECRET_KEY</code> in your server&apos;s{" "}
+        <code className="bg-slate-700 px-1 rounded">.env</code> file first.
+      </p>
+
+      <div className="input-group">
+        <label>Phone Number (Tanzania)</label>
+        <div className="relative">
+          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            type="tel"
+            placeholder="0712 345 678"
+            className="pl-10"
+          />
+        </div>
+        <p className="text-xs text-slate-500 mt-1">
+          Local format (0712…) or international (255712…) both work.
+        </p>
+      </div>
+
+      <button
+        onClick={handleTest}
+        disabled={loading || !phone.trim()}
+        className="btn-primary w-full flex items-center justify-center gap-2"
+      >
+        {loading
+          ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>
+          : <><MessageSquare className="w-4 h-4" /> Send Test SMS</>
+        }
+      </button>
+
+      {result && (
+        <div className={`flex items-start gap-3 p-3 rounded-xl border text-sm ${
+          result.success
+            ? result.simulated
+              ? "border-yellow-700/50 bg-yellow-900/20 text-yellow-300"
+              : "border-green-700/50 bg-green-900/20 text-green-300"
+            : "border-red-700/50 bg-red-900/20 text-red-300"
+        }`}>
+          {result.success
+            ? <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+            : <XCircle className="w-4 h-4 mt-0.5 shrink-0" />
+          }
+          <span>{result.message}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main Settings Page ──────────────────────────────────────────────────────
 export default function SettingsPage() {
   const { user, clear } = useAuthStore();
   const router = useRouter();
@@ -93,6 +183,9 @@ export default function SettingsPage() {
           ))}
         </div>
       </div>
+
+      {/* Test SMS — admin only */}
+      {user?.role === "ADMIN" && <TestSMSPanel />}
 
       {/* Change password */}
       <div className="card">

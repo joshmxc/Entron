@@ -9,6 +9,7 @@ import paymentsRouter from "./payments";
 import dashboardRouter from "./dashboard";
 import healthRouter from "./health";
 import messagesRouter from "./messages";
+import smsRouter from "./sms";
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use("/scans", scansRouter);
 router.use("/payments", paymentsRouter);
 router.use("/dashboard", dashboardRouter);
 router.use("/health", healthRouter);
+router.use("/sms", smsRouter);
 
 export default router;

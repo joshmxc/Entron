@@ -64,6 +64,13 @@ export const config = {
     sandbox: optional("SMS_SANDBOX", "false") === "true",
   },
 
+  // Beem Africa SMS (https://apisms.beem.africa)
+  beem: {
+    apiKey:    optional("BEEM_API_KEY", ""),
+    secretKey: optional("BEEM_SECRET_KEY", ""),
+    senderId:  optional("BEEM_SENDER_ID", "ENTRON"),
+  },
+
   storage: {
     type: optional("STORAGE_TYPE", "local") as "local" | "s3",
     uploadDir: optional("UPLOAD_DIR", "./uploads"),
