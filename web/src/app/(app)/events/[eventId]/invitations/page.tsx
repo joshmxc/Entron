@@ -346,11 +346,19 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
   const [sending,       setSending]       = useState(false);
   const [showPreview,   setShowPreview]   = useState(false);
 
+  // Determine the starting step from server data ONCE on initial load only.
+  // After that, step is driven explicitly by saveTemplate / importExcel / etc.
+  // Using a ref instead of running on every data change prevents the step from
+  // resetting to "template" when SWR briefly clears its cache during a refetch.
+  const stepInitialized = useRef(false);
   useEffect(() => {
+    if (stepInitialized.current) return;   // already set — don't override
+    if (templateData === undefined) return; // SWR still loading, wait
+    stepInitialized.current = true;
     if (template && guests.length > 0) setStep("done");
     else if (template) setStep("excel");
-    else setStep("template");
-  }, [template, guests.length]);
+    // else: stay on "template" (already the initial value)
+  }, [templateData, template, guests.length]);
 
   const openEditor = (t?: Template) => {
     if (t) { setFields(t.fields ?? DEFAULT_FIELDS); setPreviewUrl(t.fileUrl); setPendingFile(null); }
@@ -374,6 +382,7 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
       }
       await mutateTemplates();
       setPendingFile(null);
+      setPreviewUrl(null); // clear local blob URL — template.fileUrl is now the saved one
       setStep("excel");
     } finally {
       setSavingTemplate(false);
