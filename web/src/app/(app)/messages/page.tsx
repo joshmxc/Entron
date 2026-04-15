@@ -6,7 +6,6 @@ import {
   Clock, Search, Users, User, Loader2,
 } from "lucide-react";
 import api from "@/lib/api";
-import { useLang } from "@/hooks/useLang";
 import { cn } from "@/lib/utils";
 
 const fetcher = (url: string) => api.get(url).then((r) => r.data);
@@ -22,9 +21,9 @@ const TYPE_LABEL: Record<GuestType, string> = { SINGLE: "Single", DOUBLE: "Doubl
 const TYPE_COLOR: Record<GuestType, string> = { SINGLE: "badge-blue", DOUBLE: "badge-purple", FAMILY: "badge-green", VIP: "badge-yellow" };
 
 const CHANNEL_OPTIONS: { value: Channel; label: string; icon: React.ReactNode; color: string }[] = [
-  { value: "SMS",       label: "SMS",         icon: <Phone className="w-4 h-4" />,          color: "border-blue-500 bg-blue-500/10 text-blue-400" },
-  { value: "WHATSAPP",  label: "WhatsApp",    icon: <MessageSquare className="w-4 h-4" />,  color: "border-green-500 bg-blue-500/10 text-blue-400" },
-  { value: "BOTH",      label: "SMS + WhatsApp", icon: <Send className="w-4 h-4" />,        color: "border-purple-500 bg-purple-500/10 text-purple-400" },
+  { value: "SMS",      label: "SMS",            icon: <Phone className="w-4 h-4" />,         color: "border-blue-500 bg-blue-500/10 text-blue-400" },
+  { value: "WHATSAPP", label: "WhatsApp",       icon: <MessageSquare className="w-4 h-4" />, color: "border-green-500 bg-blue-500/10 text-blue-400" },
+  { value: "BOTH",     label: "SMS + WhatsApp", icon: <Send className="w-4 h-4" />,          color: "border-purple-500 bg-purple-500/10 text-purple-400" },
 ];
 
 const MSG_STATUS_ICON: Record<string, React.ReactNode> = {
@@ -34,8 +33,6 @@ const MSG_STATUS_ICON: Record<string, React.ReactNode> = {
 };
 
 export default function MessagesPage() {
-  const { lang } = useLang();
-
   const { data: eventsData } = useSWR("/events", fetcher);
   const events: Event[] = eventsData?.data ?? [];
 
@@ -88,34 +85,15 @@ export default function MessagesPage() {
     }
   };
 
-  const T = {
-    title:       { sw: "Ujumbe / SMS",      en: "Messages / SMS" },
-    event:       { sw: "Chagua Tukio",      en: "Select Event" },
-    compose:     { sw: "Tunga Ujumbe",      en: "Compose" },
-    history:     { sw: "Historia",          en: "History" },
-    channel:     { sw: "Njia ya Kutuma",    en: "Send via" },
-    recipients:  { sw: "Wapokeaji",         en: "Recipients" },
-    all:         { sw: "Wote",              en: "All" },
-    byType:      { sw: "Aina",              en: "By Type" },
-    pick:        { sw: "Chagua",            en: "Pick" },
-    msgLabel:    { sw: "Ujumbe",            en: "Message" },
-    sendBtn:     { sw: "Tuma",              en: "Send" },
-    sending:     { sw: "Inatuma...",        en: "Sending..." },
-    noHistory:   { sw: "Hakuna ujumbe",     en: "No messages yet" },
-    balance:     { sw: "Salio la SMS",      en: "SMS Balance" },
-    noPhone:     { sw: "Hakuna nambari",    en: "No phone" },
-  };
-  const t = (k: keyof typeof T) => T[k][lang];
-
   return (
     <div className="space-y-5 max-w-3xl">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="page-title">{t("title")}</h1>
+        <h1 className="page-title">Messages / SMS</h1>
         {smsBalance && (
           <div className="text-xs text-slate-400 flex items-center gap-1.5">
             <Phone className="w-3.5 h-3.5 text-blue-400" />
-            <span>{t("balance")}: <strong className="text-slate-200">{smsBalance.display}</strong></span>
+            <span>SMS Balance: <strong className="text-slate-200">{smsBalance.display}</strong></span>
           </div>
         )}
       </div>
@@ -123,7 +101,7 @@ export default function MessagesPage() {
       {/* Event selector */}
       {events.length > 1 && (
         <div className="flex items-center gap-3">
-          <label className="text-sm text-slate-400 shrink-0">{t("event")}:</label>
+          <label className="text-sm text-slate-400 shrink-0">Select Event:</label>
           <select value={selectedEventId || eventId} onChange={(e) => setSelectedEventId(e.target.value)} className="flex-1 text-sm">
             {events.map((ev) => <option key={ev.id} value={ev.id}>{ev.name}</option>)}
           </select>
@@ -132,7 +110,7 @@ export default function MessagesPage() {
 
       {/* Tabs */}
       <div className="flex border-b border-entron-dark-border">
-        {([["compose", t("compose"), <Send key="s" className="w-4 h-4" />], ["history", t("history"), <MessageSquare key="m" className="w-4 h-4" />]] as [string, string, React.ReactNode][]).map(([key, label, icon]) => (
+        {([["compose", "Compose", <Send key="s" className="w-4 h-4" />], ["history", "History", <MessageSquare key="m" className="w-4 h-4" />]] as [string, string, React.ReactNode][]).map(([key, label, icon]) => (
           <button key={key} onClick={() => setTab(key as typeof tab)}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === key ? "border-entron-blue text-entron-blue" : "border-transparent text-slate-400 hover:text-slate-200"}`}>
             {icon}{label}
@@ -143,10 +121,9 @@ export default function MessagesPage() {
       {/* ── COMPOSE ── */}
       {tab === "compose" && (
         <div className="space-y-4">
-
           {/* Channel */}
           <div className="card space-y-3">
-            <h2 className="text-sm font-semibold text-slate-200">{t("channel")}</h2>
+            <h2 className="text-sm font-semibold text-slate-200">Send via</h2>
             <div className="grid grid-cols-3 gap-3">
               {CHANNEL_OPTIONS.map(({ value, label, icon, color }) => (
                 <button key={value} onClick={() => setChannel(value)}
@@ -161,10 +138,10 @@ export default function MessagesPage() {
           {/* Recipients */}
           <div className="card space-y-3">
             <h2 className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-              <Users className="w-4 h-4 text-entron-blue" />{t("recipients")}
+              <Users className="w-4 h-4 text-entron-blue" /> Recipients
             </h2>
             <div className="flex gap-2 flex-wrap">
-              {([["all", `${t("all")} (${guests.length})`], ["type", t("byType")], ["select", t("pick")]] as [string, string][]).map(([mode, label]) => (
+              {([["all", `All (${guests.length})`], ["type", "By Type"], ["select", "Pick"]] as [string, string][]).map(([mode, label]) => (
                 <button key={mode} onClick={() => setRecipientMode(mode as typeof recipientMode)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${recipientMode === mode ? "border-entron-blue bg-entron-blue/10 text-entron-blue" : "border-entron-dark-border text-slate-400"}`}>
                   {label}
@@ -174,12 +151,12 @@ export default function MessagesPage() {
 
             {recipientMode === "type" && (
               <div className="flex flex-wrap gap-2">
-                {(["SINGLE", "DOUBLE", "FAMILY", "VIP"] as GuestType[]).map((t2) => {
-                  const count = guests.filter((g) => g.guestType === t2).length;
+                {(["SINGLE", "DOUBLE", "FAMILY", "VIP"] as GuestType[]).map((type) => {
+                  const count = guests.filter((g) => g.guestType === type).length;
                   return (
-                    <button key={t2} onClick={() => toggleType(t2)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTypes.has(t2) ? "border-entron-blue bg-entron-blue/10 text-entron-blue" : "border-entron-dark-border text-slate-400"}`}>
-                      {TYPE_LABEL[t2]} ({count})
+                    <button key={type} onClick={() => toggleType(type)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${selectedTypes.has(type) ? "border-entron-blue bg-entron-blue/10 text-entron-blue" : "border-entron-dark-border text-slate-400"}`}>
+                      {TYPE_LABEL[type]} ({count})
                     </button>
                   );
                 })}
@@ -198,7 +175,7 @@ export default function MessagesPage() {
                       <input type="checkbox" checked={selectedIds.has(g.id)} onChange={() => toggleGuest(g.id)} className="accent-entron-blue" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-slate-200 truncate">{g.firstName} {g.lastName}</p>
-                        {g.phone ? <p className="text-xs text-slate-500">{g.phone}</p> : <p className="text-xs text-red-400">{t("noPhone")}</p>}
+                        {g.phone ? <p className="text-xs text-slate-500">{g.phone}</p> : <p className="text-xs text-red-400">No phone</p>}
                       </div>
                       <span className={`badge text-xs ${TYPE_COLOR[g.guestType]}`}>{TYPE_LABEL[g.guestType]}</span>
                     </label>
@@ -209,15 +186,15 @@ export default function MessagesPage() {
 
             <p className="text-xs text-slate-400 flex items-center gap-1.5">
               <User className="w-3.5 h-3.5" />
-              <strong className="text-slate-200">{resolvedIds.length}</strong> {lang === "sw" ? "watalopokea" : "will receive"}
+              <strong className="text-slate-200">{resolvedIds.length}</strong> will receive
             </p>
           </div>
 
           {/* Message */}
           <div className="card space-y-3">
-            <h2 className="text-sm font-semibold text-slate-200">{t("msgLabel")}</h2>
+            <h2 className="text-sm font-semibold text-slate-200">Message</h2>
             <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={4} className="text-sm w-full"
-              placeholder={lang === "sw" ? "Andika ujumbe hapa...\n\nTumia {{name}} kwa jina la mgeni" : "Write your message...\n\nUse {{name}} for guest name"} />
+              placeholder={"Write your message...\n\nUse {{name}} for guest name"} />
             <div className="flex items-center justify-between text-xs text-slate-500">
               <div className="flex gap-2">
                 {["{{name}}", "{{firstName}}", "{{lastName}}"].map((v) => (
@@ -225,7 +202,7 @@ export default function MessagesPage() {
                     className="px-2 py-0.5 rounded bg-slate-700 font-mono hover:bg-slate-600 transition-colors">{v}</button>
                 ))}
               </div>
-              <span>{message.length} {lang === "sw" ? "herufi" : "chars"} · SMS: {Math.ceil(message.length / 160) || 1}</span>
+              <span>{message.length} chars · SMS: {Math.ceil(message.length / 160) || 1}</span>
             </div>
           </div>
 
@@ -235,7 +212,7 @@ export default function MessagesPage() {
               <div className="flex items-center gap-3">
                 {sendResult.failed === 0 ? <CheckCircle2 className="w-5 h-5 text-blue-400" /> : <XCircle className="w-5 h-5 text-yellow-400" />}
                 <p className="text-sm font-semibold text-slate-200">
-                  {lang === "sw" ? "Zimetumwa" : "Sent"}: {sendResult.sent} · {lang === "sw" ? "Zimeshindwa" : "Failed"}: {sendResult.failed}
+                  Sent: {sendResult.sent} · Failed: {sendResult.failed}
                 </p>
               </div>
             </div>
@@ -243,7 +220,10 @@ export default function MessagesPage() {
 
           {/* Send button */}
           <button onClick={send} disabled={sending || !message.trim() || resolvedIds.length === 0} className="btn-primary w-full py-3">
-            {sending ? <><Loader2 className="w-4 h-4 animate-spin" />{t("sending")}</> : <><Send className="w-4 h-4" />{t("sendBtn")} ({resolvedIds.length})</>}
+            {sending
+              ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>
+              : <><Send className="w-4 h-4" /> Send ({resolvedIds.length})</>
+            }
           </button>
         </div>
       )}
@@ -251,11 +231,11 @@ export default function MessagesPage() {
       {/* ── HISTORY ── */}
       {tab === "history" && (
         <div className="card space-y-3">
-          <h2 className="font-semibold text-slate-200">{t("history")} ({history.length})</h2>
+          <h2 className="font-semibold text-slate-200">History ({history.length})</h2>
           {history.length === 0 ? (
             <div className="text-center py-10 text-slate-500">
               <MessageSquare className="w-8 h-8 mx-auto mb-2" />
-              <p className="text-sm">{t("noHistory")}</p>
+              <p className="text-sm">No messages yet</p>
             </div>
           ) : (
             <div className="space-y-2 max-h-[32rem] overflow-y-auto">
@@ -269,12 +249,12 @@ export default function MessagesPage() {
                         {msg.channel === "WHATSAPP" ? "WhatsApp" : "SMS"}
                       </span>
                       <span className={`badge text-xs ${msg.status === "SENT" ? "badge-green" : msg.status === "FAILED" ? "badge-red" : "badge-yellow"}`}>
-                        {msg.status === "SENT" ? (lang === "sw" ? "Imetumwa" : "Sent") : msg.status === "FAILED" ? (lang === "sw" ? "Imeshindwa" : "Failed") : "Pending"}
+                        {msg.status === "SENT" ? "Sent" : msg.status === "FAILED" ? "Failed" : "Pending"}
                       </span>
                     </div>
                     <p className="text-sm text-slate-300 line-clamp-2">{msg.body}</p>
                     <p className="text-xs text-slate-500 mt-1">
-                      {msg.sender?.name} · {new Date(msg.createdAt).toLocaleString(lang === "sw" ? "sw-TZ" : "en-GB", { dateStyle: "short", timeStyle: "short" })}
+                      {msg.sender?.name} · {new Date(msg.createdAt).toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" })}
                     </p>
                   </div>
                 </div>
