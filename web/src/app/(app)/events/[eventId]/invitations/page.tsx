@@ -380,10 +380,12 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
       } else if (template) {
         await api.patch(`/events/${eventId}/invitations/templates/${template.id}`, { fields });
       }
-      await mutateTemplates();
+      // Move to Step 2 immediately — don't wait for SWR refetch
       setPendingFile(null);
-      setPreviewUrl(null); // clear local blob URL — template.fileUrl is now the saved one
+      setPreviewUrl(null);
       setStep("excel");
+      // Revalidate in background so template data stays fresh
+      mutateTemplates();
     } finally {
       setSavingTemplate(false);
     }
@@ -534,7 +536,7 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
         </div>
 
         {/* ── STEP 2: Excel Upload ── */}
-        {template && (
+        {(step === "excel" || step === "done") && (
           <div className={`card space-y-4 ${step === "excel" ? "ring-2 ring-entron-blue/40" : ""}`}>
             <h2 className="font-semibold text-slate-200 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-entron-blue text-white text-xs flex items-center justify-center font-bold">2</span>
@@ -594,7 +596,7 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
             </label>
 
             {/* Preview + Generate buttons — shown when guests exist */}
-            {guests.length > 0 && !importing && (
+            {guests.length > 0 && !importing && template && (
               <div className="flex flex-wrap gap-3 pt-1">
                 {/* Preview button */}
                 <button
