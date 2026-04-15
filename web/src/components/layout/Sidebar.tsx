@@ -9,24 +9,22 @@ import {
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
 import api from "@/lib/api";
-import { useLang } from "@/hooks/useLang";
 import { useTheme } from "@/hooks/useTheme";
 
 const navItems = [
-  { href: "/dashboard",   label: { sw: "Dashibodi",   en: "Dashboard" },   icon: LayoutDashboard },
-  { href: "/events",      label: { sw: "Matukio",     en: "Events" },      icon: Calendar },
-  { href: "/guests",      label: { sw: "Wageni",      en: "Guests" },      icon: Users },
-  { href: "/invitations", label: { sw: "Mialiko",     en: "Invitations" }, icon: Mail },
-  { href: "/messages",    label: { sw: "Ujumbe/SMS",  en: "Messages/SMS" },icon: MessageSquare },
-  { href: "/staff",       label: { sw: "Wafanyakazi", en: "Staff" },       icon: UserCog, adminOnly: true },
-  { href: "/settings",    label: { sw: "Mipangilio",  en: "Settings" },    icon: Settings },
+  { href: "/dashboard",   label: "Dashboard",    icon: LayoutDashboard },
+  { href: "/events",      label: "Events",        icon: Calendar },
+  { href: "/guests",      label: "Guests",        icon: Users },
+  { href: "/invitations", label: "Invitations",   icon: Mail },
+  { href: "/messages",    label: "Messages/SMS",  icon: MessageSquare },
+  { href: "/staff",       label: "Staff",         icon: UserCog, adminOnly: true },
+  { href: "/settings",    label: "Settings",      icon: Settings },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, clear } = useAuthStore();
-  const { lang, toggle: toggleLang } = useLang();
   const { isDark, toggle: toggleTheme } = useTheme();
 
   const handleLogout = async () => {
@@ -61,7 +59,7 @@ export default function Sidebar() {
             return (
               <Link key={href} href={href} className={cn("nav-item", active && "active")}>
                 <Icon className="w-4 h-4 flex-shrink-0" />
-                {label[lang]}
+                {label}
               </Link>
             );
           })}
@@ -73,27 +71,18 @@ export default function Sidebar() {
           className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-semibold text-white"
           style={{ background: "linear-gradient(135deg,#1e3a8a,#1e3a8a)", boxShadow: "0 2px 8px rgba(30,58,138,0.35)" }}>
           <ScanLine className="w-4 h-4" />
-          {lang === "sw" ? "Anza Kuscan" : "Start Scanning"}
+          Start Scanning
         </Link>
       </div>
 
       {/* Bottom controls */}
       <div className="p-3 space-y-1.5" style={{ borderTop: "1px solid var(--border)" }}>
-        <div className="flex items-center gap-2">
-          {/* Theme toggle */}
-          <button onClick={toggleTheme}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium flex-1 transition-all"
-            style={{ backgroundColor: "var(--surface-2)", color: "var(--text-muted)", border: "1px solid var(--border)" }}>
-            {isDark ? <><Sun className="w-3.5 h-3.5 text-amber-400" /> Light</> : <><Moon className="w-3.5 h-3.5" /> Dark</>}
-          </button>
-          {/* Lang toggle */}
-          <button onClick={toggleLang}
-            className="flex items-center rounded-lg overflow-hidden"
-            style={{ border: "1px solid var(--border)" }}>
-            <span className={cn("text-xs px-2.5 py-1.5 font-semibold transition-all", lang === "sw" ? "bg-entron-blue text-white" : "text-[var(--text-muted)]")} style={lang !== "sw" ? { backgroundColor: "var(--surface-2)" } : {}}>SW</span>
-            <span className={cn("text-xs px-2.5 py-1.5 font-semibold transition-all", lang === "en" ? "bg-entron-blue text-white" : "text-[var(--text-muted)]")} style={lang !== "en" ? { backgroundColor: "var(--surface-2)" } : {}}>EN</span>
-          </button>
-        </div>
+        {/* Theme toggle */}
+        <button onClick={toggleTheme}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium w-full transition-all"
+          style={{ backgroundColor: "var(--surface-2)", color: "var(--text-muted)", border: "1px solid var(--border)" }}>
+          {isDark ? <><Sun className="w-3.5 h-3.5 text-amber-400" /> Light Mode</> : <><Moon className="w-3.5 h-3.5" /> Dark Mode</>}
+        </button>
 
         {/* User */}
         <div className="flex items-center gap-3 px-2 py-2 rounded-xl" style={{ backgroundColor: "var(--surface-2)" }}>
