@@ -11,13 +11,13 @@ const config: Config = {
     extend: {
       colors: {
         entron: {
-          green: "#1e3a8a",
-          "green-dark": "#1e3a8a",
-          gold: "#d97706",
-          "gold-dark": "#b45309",
-          dark: "#0f172a",
-          "dark-card": "#1e293b",
-          "dark-border": "#334155",
+          blue:         "#1e3a8a",
+          "blue-dark":  "#172e70",
+          gold:         "#d97706",
+          "gold-dark":  "#b45309",
+          dark:         "#0f172a",
+          "dark-card":  "#1e293b",
+          "dark-border":"#334155",
         },
       },
       fontFamily: {
