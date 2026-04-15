@@ -1,7 +1,6 @@
 import { prisma } from "../lib/prisma";
 import { sendTextMessage } from "../lib/whatsapp";
-import { sendBulkSMS, getSMSBalance } from "../lib/sms";
-import { sendBeemBulkSMS, isBeemConfigured } from "../lib/beem";
+import { sendBulkSMS as nextSmsBulk, getSMSBalance } from "../lib/nextsms";
 
 const WHATSAPP_DELAY = 60; // ms between WhatsApp messages
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -42,57 +41,32 @@ export async function sendBulkMessages(opts: {
     results.details.push({ name: `${g.firstName} ${g.lastName}`, phone: "—", status: "No phone number", channel });
   });
 
-  // ── SMS: prefer Beem if configured, fall back to messaging-service.co.tz ──
+  // ── SMS via Next SMS (messaging-service.co.tz) ───────────────────────────
   if ((channel === "SMS" || channel === "BOTH") && withPhone.length > 0) {
     try {
-      const smsMessages = withPhone.map((g) => ({
-        to: g.phone!,
-        message: personalize(message, g.firstName, g.lastName),
-        text:    personalize(message, g.firstName, g.lastName), // legacy compat
+      const smsPayload = withPhone.map((g) => ({
+        to:   g.phone!,
+        text: personalize(message, g.firstName, g.lastName),
       }));
 
-      let bulkResults: { to: string; messageId: string; status: string }[];
+      const reference = `entron_${Date.now()}`;
+      const bulkResult = await nextSmsBulk(smsPayload, reference);
 
-      if (isBeemConfigured()) {
-        // ── Beem Africa ──────────────────────────────────────────────────────
-        const beemResult = await sendBeemBulkSMS(
-          smsMessages.map((m) => ({ to: m.to, message: m.message })),
-          message // global fallback (Beem uses per-recipient messages here)
-        );
-        bulkResults = beemResult.results.map((r) => ({
-          to: r.to,
-          messageId: r.messageId,
-          status: r.status === "SENT" || r.status === "SIMULATED" ? "SENT" : "FAILED",
-        }));
-      } else {
-        // ── messaging-service.co.tz (fallback) ──────────────────────────────
-        const reference = `entron_${Date.now()}`;
-        const legacyResult = await sendBulkSMS(
-          smsMessages.map((m) => ({ to: m.to, text: m.text })),
-          reference
-        );
-        bulkResults = legacyResult.results.map((r) => ({
-          to: r.to,
-          messageId: r.messageId,
-          status: r.status.includes("FAILED") ? "FAILED" : "SENT",
-        }));
-      }
-
-      // Persist results to DB and tally
+      // Persist each result to DB and tally
       for (let i = 0; i < withPhone.length; i++) {
-        const guest = withPhone[i];
-        const apiResult = bulkResults[i];
-        const body = smsMessages[i].message;
-        const succeeded = apiResult?.status === "SENT";
+        const guest   = withPhone[i];
+        const r       = bulkResult.results[i];
+        const body    = smsPayload[i].text;
+        const succeeded = r?.status === "SENT" || r?.status === "SIMULATED";
 
         await prisma.outboundMessage.create({
           data: {
             sentBy,
-            phone: guest.phone!,
+            phone:      guest.phone!,
             body,
-            channel: "SMS",
-            externalId: apiResult?.messageId ?? null,
-            status: succeeded ? "SENT" : "FAILED",
+            channel:    "SMS",
+            externalId: r?.messageId ?? null,
+            status:     succeeded ? "SENT" : "FAILED",
           },
         });
 
@@ -105,8 +79,8 @@ export async function sendBulkMessages(opts: {
         }
       }
     } catch (err) {
-      console.error("[SMS] Bulk send error:", err);
-      // Whole batch failed — record all as failed
+      console.error("[NextSMS] Bulk send error:", err);
+      // Entire batch failed — mark all as failed
       for (const guest of withPhone) {
         await prisma.outboundMessage.create({
           data: { sentBy, phone: guest.phone!, body: personalize(message, guest.firstName, guest.lastName), channel: "SMS", status: "FAILED" },

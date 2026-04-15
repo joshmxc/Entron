@@ -57,18 +57,12 @@ export const config = {
     callbackUrl: optional("TIGO_CALLBACK_URL"),
   },
 
-  sms: {
-    apiKey: optional("SMS_API_KEY", ""),
-    authType: optional("SMS_AUTH_TYPE", "basic") as "bearer" | "basic",
-    senderId: optional("SMS_SENDER_ID", "ENTRON"),
-    sandbox: optional("SMS_SANDBOX", "false") === "true",
-  },
-
-  // Beem Africa SMS (https://apisms.beem.africa)
-  beem: {
-    apiKey:    optional("BEEM_API_KEY", ""),
-    secretKey: optional("BEEM_SECRET_KEY", ""),
-    senderId:  optional("BEEM_SENDER_ID", "ENTRON"),
+  // Next SMS (messaging-service.co.tz)
+  // Credentials from: https://nextsms.co.tz → My Account → API
+  nextsms: {
+    username: optional("NEXTSMS_USERNAME", ""),
+    password: optional("NEXTSMS_PASSWORD", ""),
+    senderId: optional("NEXTSMS_SENDER_ID", "ENTRON"),
   },
 
   storage: {

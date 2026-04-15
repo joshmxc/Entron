@@ -1,11 +1,14 @@
 /**
- * Beem SMS Routes
+ * Standalone SMS Routes — Next SMS
  * Mounted at: /api/v1/sms
  *
- * POST /api/v1/sms/send   — send to one recipient
- * POST /api/v1/sms/bulk   — send to many recipients
- * POST /api/v1/sms/test   — admin test (fixed message, verify credentials)
- * GET  /api/v1/sms/status — check if Beem is configured
+ * GET  /sms/status   — check if Next SMS credentials are configured
+ * GET  /sms/balance  — fetch credit balance from Next SMS
+ * POST /sms/send     — send one SMS (phone + message)
+ * POST /sms/bulk     — send to many recipients
+ * POST /sms/test     — admin test: fixed message to verify credentials
+ *
+ * All routes require authentication and admin role.
  */
 
 import { Router } from "express";
@@ -14,10 +17,10 @@ import * as ctrl from "../controllers/sms.controller";
 
 const router = Router();
 
-// All SMS routes require a logged-in admin
 router.use(authenticate, requireAdmin);
 
-router.get("/status", ctrl.getStatus);
+router.get("/status",  ctrl.getStatus);
+router.get("/balance", ctrl.getBalance);
 router.post("/send",   ctrl.sendSingle);
 router.post("/bulk",   ctrl.sendBulk);
 router.post("/test",   ctrl.testSMS);

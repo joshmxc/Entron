@@ -31,7 +31,7 @@ function TestSMSPanel() {
       setResult({
         success: true,
         message: data?.simulated
-          ? `Simulated — Beem credentials not set yet. To: ${data?.to}`
+          ? `Simulated — Next SMS credentials not set yet. To: ${data?.to}`
           : `SMS sent! To: ${data?.to} | ID: ${data?.messageId}`,
         simulated: data?.simulated,
       });
@@ -48,12 +48,12 @@ function TestSMSPanel() {
   return (
     <div className="card space-y-4">
       <h2 className="font-semibold text-slate-200 flex items-center gap-2">
-        <MessageSquare className="w-4 h-4 text-entron-blue" /> Test SMS (Beem Africa)
+        <MessageSquare className="w-4 h-4 text-entron-blue" /> Test SMS (Next SMS)
       </h2>
       <p className="text-xs text-slate-400">
-        Send a test message to verify your Beem credentials are working.
-        Set <code className="bg-slate-700 px-1 rounded">BEEM_API_KEY</code> and{" "}
-        <code className="bg-slate-700 px-1 rounded">BEEM_SECRET_KEY</code> in your server&apos;s{" "}
+        Send a test message to verify your Next SMS credentials are working.
+        Set <code className="bg-slate-700 px-1 rounded">NEXTSMS_USERNAME</code> and{" "}
+        <code className="bg-slate-700 px-1 rounded">NEXTSMS_PASSWORD</code> in your server&apos;s{" "}
         <code className="bg-slate-700 px-1 rounded">.env</code> file first.
       </p>
 
