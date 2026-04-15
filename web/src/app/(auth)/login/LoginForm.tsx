@@ -9,8 +9,8 @@ import api from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 
 const schema = z.object({
-  phone: z.string().min(9, "Nambari ya simu inahitajika"),
-  password: z.string().min(6, "Nenosiri linahitajika"),
+  phone: z.string().min(9, "Phone number is required"),
+  password: z.string().min(6, "Password is required"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -34,7 +34,7 @@ export default function LoginForm() {
       setUser(user);
       router.push("/dashboard");
     } catch {
-      setError("Nambari ya simu au nenosiri si sahihi");
+      setError("Invalid phone number or password");
     }
   };
 
@@ -47,7 +47,7 @@ export default function LoginForm() {
       )}
 
       <div className="input-group">
-        <label>Nambari ya Simu</label>
+        <label>Phone Number</label>
         <div className="relative">
           <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -61,7 +61,7 @@ export default function LoginForm() {
       </div>
 
       <div className="input-group">
-        <label>Nenosiri</label>
+        <label>Password</label>
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -82,7 +82,7 @@ export default function LoginForm() {
       </div>
 
       <button type="submit" disabled={isSubmitting} className="btn-primary btn-lg w-full mt-2">
-        {isSubmitting ? "Inaingia..." : "Ingia"}
+        {isSubmitting ? "Signing in..." : "Sign In"}
       </button>
     </form>
   );
