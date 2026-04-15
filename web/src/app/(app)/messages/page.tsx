@@ -18,7 +18,7 @@ interface Event { id: string; name: string }
 interface Guest { id: string; firstName: string; lastName: string; phone?: string; guestType: GuestType; eventId: string }
 interface Message { id: string; phone: string; body: string; channel: string; status: string; createdAt: string; sender: { name: string } }
 
-const TYPE_LABEL: Record<GuestType, string> = { SINGLE: "Mmoja", DOUBLE: "Wawili", FAMILY: "Familia", VIP: "VIP" };
+const TYPE_LABEL: Record<GuestType, string> = { SINGLE: "Single", DOUBLE: "Double", FAMILY: "Family", VIP: "VIP" };
 const TYPE_COLOR: Record<GuestType, string> = { SINGLE: "badge-blue", DOUBLE: "badge-purple", FAMILY: "badge-green", VIP: "badge-yellow" };
 
 const CHANNEL_OPTIONS: { value: Channel; label: string; icon: React.ReactNode; color: string }[] = [
@@ -190,7 +190,7 @@ export default function MessagesPage() {
               <div className="space-y-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tafuta..." className="w-full pl-9 text-sm" />
+                  <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="w-full pl-9 text-sm" />
                 </div>
                 <div className="max-h-48 overflow-y-auto space-y-1">
                   {filtered.map((g) => (

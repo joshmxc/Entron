@@ -17,7 +17,7 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 const TYPE_LABELS: Record<string, string> = {
-  SINGLE: "Mmoja", DOUBLE: "Wawili", FAMILY: "Familia", VIP: "VIP",
+  SINGLE: "Single", DOUBLE: "Double", FAMILY: "Family", VIP: "VIP",
 };
 
 export default function GuestsPage({ params }: { params: Promise<{ eventId: string }> }) {
@@ -42,17 +42,17 @@ export default function GuestsPage({ params }: { params: Promise<{ eventId: stri
         <Link href={`/events/${eventId}`} className="text-slate-400 hover:text-slate-100">
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <h1 className="page-title flex-1">Wageni ({total})</h1>
+        <h1 className="page-title flex-1">Guests ({total})</h1>
         <div className="flex gap-2">
           {isAdmin && (
             <Link href={`/events/${eventId}/guests/import`} className="btn-secondary">
               <Upload className="w-4 h-4" />
-              <span className="hidden sm:inline">Ingiza</span>
+              <span className="hidden sm:inline">Import</span>
             </Link>
           )}
           <Link href={`/events/${eventId}/guests/new`} className="btn-primary">
             <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Ongeza</span>
+            <span className="hidden sm:inline">Add</span>
           </Link>
         </div>
       </div>
@@ -64,7 +64,7 @@ export default function GuestsPage({ params }: { params: Promise<{ eventId: stri
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Tafuta wageni..."
+            placeholder="Search guests..."
             className="pl-10"
           />
         </div>
@@ -78,24 +78,24 @@ export default function GuestsPage({ params }: { params: Promise<{ eventId: stri
                 filter === f ? "bg-entron-blue text-white" : "text-slate-400 hover:text-slate-200"
               )}
             >
-              {f === "all" ? "Wote" : f === "in" ? "Walioingia" : "Hawajaingia"}
+              {f === "all" ? "All" : f === "in" ? "Checked In" : "Not In"}
             </button>
           ))}
         </div>
       </div>
 
-      {isLoading && <div className="text-center text-slate-400 py-8">Inapakia...</div>}
+      {isLoading && <div className="text-center text-slate-400 py-8">Loading...</div>}
 
       {/* Desktop table */}
       <div className="table-container hidden md:block">
         <table className="entron-table">
           <thead>
             <tr>
-              <th>Mgeni</th>
-              <th>Simu</th>
-              <th>Meza</th>
-              <th>Tiketi</th>
-              <th>Hali</th>
+              <th>Guest</th>
+              <th>Phone</th>
+              <th>Table</th>
+              <th>Ticket</th>
+              <th>Status</th>
               <th></th>
             </tr>
           </thead>
@@ -116,17 +116,17 @@ export default function GuestsPage({ params }: { params: Promise<{ eventId: stri
                 <td>
                   {g.isCheckedIn ? (
                     <span className="flex items-center gap-1 text-blue-400 text-sm">
-                      <CheckCircle className="w-3.5 h-3.5" /> Ameingia
+                      <CheckCircle className="w-3.5 h-3.5" /> Checked In
                     </span>
                   ) : (
                     <span className="flex items-center gap-1 text-slate-500 text-sm">
-                      <Clock className="w-3.5 h-3.5" /> Anasubiri
+                      <Clock className="w-3.5 h-3.5" /> Waiting
                     </span>
                   )}
                 </td>
                 <td>
                   <Link href={`/events/${eventId}/guests/${g.id}`} className="text-entron-blue text-sm hover:underline">
-                    Angalia
+                    View
                   </Link>
                 </td>
               </tr>
@@ -153,7 +153,7 @@ export default function GuestsPage({ params }: { params: Promise<{ eventId: stri
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-medium text-slate-200">{g.firstName as string} {g.lastName as string}</p>
-              <p className="text-xs text-slate-400">{(g.phone as string) ?? ""} {g.tableNumber ? `· Meza ${g.tableNumber as string}` : ""}</p>
+              <p className="text-xs text-slate-400">{(g.phone as string) ?? ""} {g.tableNumber ? `· Table ${g.tableNumber as string}` : ""}</p>
             </div>
             <span className={`badge ${TYPE_COLORS[g.guestType as string] ?? "badge-blue"}`}>
               {TYPE_LABELS[g.guestType as string]}
@@ -165,7 +165,7 @@ export default function GuestsPage({ params }: { params: Promise<{ eventId: stri
       {!isLoading && guests.length === 0 && (
         <div className="card text-center py-12">
           <QrCode className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400">Hakuna wageni</p>
+          <p className="text-slate-400">No guests yet</p>
         </div>
       )}
     </div>

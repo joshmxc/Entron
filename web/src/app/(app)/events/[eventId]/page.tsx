@@ -26,7 +26,7 @@ export default function EventPage({ params }: { params: Promise<{ eventId: strin
     }
   }, [event]);
 
-  if (!event) return <div className="text-slate-400 text-center py-12">Inapakia...</div>;
+  if (!event) return <div className="text-slate-400 text-center py-12">Loading...</div>;
 
   const attendance = stats?.attendance ?? 0;
 
@@ -46,7 +46,7 @@ export default function EventPage({ params }: { params: Promise<{ eventId: strin
       {stats && (
         <div className="card">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-slate-400">Mahudhurio</span>
+            <span className="text-sm text-slate-400">Attendance</span>
             <span className="text-lg font-bold text-entron-blue">{attendance}%</span>
           </div>
           <div className="w-full bg-slate-700 rounded-full h-3">
@@ -56,8 +56,8 @@ export default function EventPage({ params }: { params: Promise<{ eventId: strin
             />
           </div>
           <div className="flex justify-between mt-2 text-xs text-slate-500">
-            <span>{stats.checkedIn} walioingia</span>
-            <span>{stats.totalGuests} wote</span>
+            <span>{stats.checkedIn} checked in</span>
+            <span>{stats.totalGuests} total</span>
           </div>
         </div>
       )}
@@ -65,10 +65,10 @@ export default function EventPage({ params }: { params: Promise<{ eventId: strin
       {/* Quick stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: "Wageni Wote", value: stats?.totalGuests ?? 0, icon: Users, color: "text-blue-400" },
-          { label: "Walioingia", value: stats?.checkedIn ?? 0, icon: CheckCircle, color: "text-blue-400" },
-          { label: "Skani Zote", value: stats?.scans?.total ?? 0, icon: QrCode, color: "text-purple-400" },
-          { label: "Halali", value: stats?.scans?.SUCCESS ?? 0, icon: TrendingUp, color: "text-entron-blue" },
+          { label: "Total Guests", value: stats?.totalGuests ?? 0, icon: Users, color: "text-blue-400" },
+          { label: "Checked In", value: stats?.checkedIn ?? 0, icon: CheckCircle, color: "text-blue-400" },
+          { label: "Total Scans", value: stats?.scans?.total ?? 0, icon: QrCode, color: "text-purple-400" },
+          { label: "Valid", value: stats?.scans?.SUCCESS ?? 0, icon: TrendingUp, color: "text-entron-blue" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="stat-card">
             <Icon className={`w-5 h-5 ${color}`} />
@@ -82,19 +82,19 @@ export default function EventPage({ params }: { params: Promise<{ eventId: strin
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <Link href={`/events/${eventId}/guests`} className="card hover:border-entron-blue/50 transition-all text-center py-6">
           <Users className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-          <p className="font-medium text-slate-200">Wageni</p>
+          <p className="font-medium text-slate-200">Guests</p>
         </Link>
         <Link href={`/events/${eventId}/scan`} className="card hover:border-entron-blue/50 transition-all text-center py-6 border-entron-blue/30">
           <Scan className="w-8 h-8 text-entron-blue mx-auto mb-2" />
-          <p className="font-medium text-slate-200">Skana</p>
+          <p className="font-medium text-slate-200">Scan</p>
         </Link>
         <Link href={`/events/${eventId}/invitations`} className="card hover:border-entron-blue/50 transition-all text-center py-6">
           <Mail className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-          <p className="font-medium text-slate-200">Mialiko</p>
+          <p className="font-medium text-slate-200">Invitations</p>
         </Link>
         <Link href={`/events/${eventId}/messages`} className="card hover:border-entron-blue/50 transition-all text-center py-6">
           <MessageSquare className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-          <p className="font-medium text-slate-200">Ujumbe</p>
+          <p className="font-medium text-slate-200">Messages</p>
         </Link>
       </div>
     </div>

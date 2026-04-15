@@ -1,6 +1,5 @@
 "use client";
 import { use } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import useSWR from "swr";
 import { ArrowLeft, RefreshCw, Phone, Mail, QrCode, CheckCircle, Clock, Printer } from "lucide-react";
@@ -8,13 +7,13 @@ import api from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 
 const fetcher = (url: string) => api.get(url).then((r) => r.data);
-const TYPE_LABELS: Record<string, string> = { SINGLE: "Mmoja", DOUBLE: "Wawili", FAMILY: "Familia", VIP: "VIP" };
+const TYPE_LABELS: Record<string, string> = { SINGLE: "Single", DOUBLE: "Double", FAMILY: "Family", VIP: "VIP" };
 const STATUS_LABELS: Record<string, string> = {
-  SUCCESS: "Ameingia",
-  ALREADY_SCANNED: "Imeskanwa",
-  LIMIT_REACHED: "Kikomo",
-  INVALID_QR: "Batili",
-  WRONG_EVENT: "Tukio Tofauti",
+  SUCCESS: "Checked In",
+  ALREADY_SCANNED: "Already Scanned",
+  LIMIT_REACHED: "Limit Reached",
+  INVALID_QR: "Invalid QR",
+  WRONG_EVENT: "Wrong Event",
 };
 
 export default function GuestDetailPage({ params }: { params: Promise<{ eventId: string; guestId: string }> }) {
@@ -27,9 +26,8 @@ export default function GuestDetailPage({ params }: { params: Promise<{ eventId:
     mutate();
   };
 
-  if (!guest) return <div className="text-slate-400 text-center py-12">Inapakia...</div>;
+  if (!guest) return <div className="text-slate-400 text-center py-12">Loading...</div>;
 
-  // QR images are proxied via Next.js rewrites — use relative path
   const apiBase = "";
 
   return (
@@ -49,13 +47,13 @@ export default function GuestDetailPage({ params }: { params: Promise<{ eventId:
         }
         <div>
           <p className="font-semibold text-slate-100">
-            {guest.isCheckedIn ? "Ameingia" : "Hajaingiza bado"}
+            {guest.isCheckedIn ? "Checked In" : "Not yet checked in"}
           </p>
           {guest.checkedInAt && (
             <p className="text-sm text-slate-400">{formatDate(guest.checkedInAt)}</p>
           )}
           <p className="text-sm text-slate-400">
-            Imeingia {guest.admissionsUsed}/{guest.maxAdmissions} mara
+            Entry {guest.admissionsUsed}/{guest.maxAdmissions}
           </p>
         </div>
       </div>
@@ -63,13 +61,13 @@ export default function GuestDetailPage({ params }: { params: Promise<{ eventId:
       <div className="grid md:grid-cols-2 gap-6">
         {/* Info */}
         <div className="card space-y-3">
-          <h3 className="font-semibold text-slate-200">Taarifa za Mgeni</h3>
+          <h3 className="font-semibold text-slate-200">Guest Details</h3>
           <div className="space-y-2 text-sm">
             {[
-              { label: "Aina ya Tiketi", value: TYPE_LABELS[guest.guestType] ?? guest.guestType },
-              { label: "Meza", value: guest.tableNumber ?? "—" },
-              { label: "Kiti", value: guest.seatNumber ?? "—" },
-              { label: "Maelezo", value: guest.notes ?? "—" },
+              { label: "Ticket Type", value: TYPE_LABELS[guest.guestType] ?? guest.guestType },
+              { label: "Table", value: guest.tableNumber ?? "—" },
+              { label: "Seat", value: guest.seatNumber ?? "—" },
+              { label: "Notes", value: guest.notes ?? "—" },
             ].map(({ label, value }) => (
               <div key={label} className="flex justify-between">
                 <span className="text-slate-400">{label}</span>
@@ -111,10 +109,10 @@ export default function GuestDetailPage({ params }: { params: Promise<{ eventId:
           )}
           <div className="flex gap-2 w-full">
             <button onClick={regenerateQR} className="btn-secondary flex-1 text-xs">
-              <RefreshCw className="w-3.5 h-3.5" /> Tengeneza Upya
+              <RefreshCw className="w-3.5 h-3.5" /> Regenerate
             </button>
             <button onClick={() => window.print()} className="btn-secondary flex-1 text-xs no-print">
-              <Printer className="w-3.5 h-3.5" /> Chapa
+              <Printer className="w-3.5 h-3.5" /> Print
             </button>
           </div>
         </div>
@@ -123,7 +121,7 @@ export default function GuestDetailPage({ params }: { params: Promise<{ eventId:
       {/* Scan history */}
       {guest.scans?.length > 0 && (
         <div className="card">
-          <h3 className="font-semibold text-slate-200 mb-3">Historia ya Skani</h3>
+          <h3 className="font-semibold text-slate-200 mb-3">Scan History</h3>
           <div className="space-y-2">
             {guest.scans.map((scan: Record<string, unknown>) => (
               <div key={String(scan.id)} className="flex items-center gap-3 text-sm">

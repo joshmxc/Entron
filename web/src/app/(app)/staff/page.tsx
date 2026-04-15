@@ -46,9 +46,9 @@ export default function StaffPage() {
   return (
     <div className="space-y-6">
       <div className="page-header">
-        <h1 className="page-title">Wafanyakazi</h1>
+        <h1 className="page-title">Staff</h1>
         <button onClick={() => setShowForm(!showForm)} className="btn-primary">
-          <Plus className="w-4 h-4" /> Ongeza
+          <Plus className="w-4 h-4" /> Add
         </button>
       </div>
 
@@ -81,37 +81,37 @@ export default function StaffPage() {
 
       {showForm && (
         <form onSubmit={handleSubmit(onSubmit)} className="card space-y-4">
-          <h2 className="font-semibold text-slate-200">Mfanyakazi Mpya</h2>
+          <h2 className="font-semibold text-slate-200">New Staff Member</h2>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="input-group">
-              <label>Jina Kamili</label>
-              <input {...register("name")} placeholder="Amani Baraka" />
+              <label>Full Name</label>
+              <input {...register("name")} placeholder="Jane Smith" />
               {errors.name && <p className="text-red-400 text-xs">{errors.name.message}</p>}
             </div>
             <div className="input-group">
-              <label>Nambari ya Simu</label>
+              <label>Phone Number</label>
               <input {...register("phone")} type="tel" placeholder="0700 000 000" />
               {errors.phone && <p className="text-red-400 text-xs">{errors.phone.message}</p>}
             </div>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="input-group">
-              <label>Nenosiri</label>
-              <input {...register("password")} type="password" placeholder="min. herufi 6" />
+              <label>Password</label>
+              <input {...register("password")} type="password" placeholder="min. 6 characters" />
               {errors.password && <p className="text-red-400 text-xs">{errors.password.message}</p>}
             </div>
             <div className="input-group">
-              <label>Wadhifa</label>
+              <label>Role</label>
               <select {...register("role")}>
-                <option value="STAFF">Mhudumu</option>
-                <option value="ADMIN">Msimamizi</option>
+                <option value="STAFF">Staff</option>
+                <option value="ADMIN">Admin</option>
               </select>
             </div>
           </div>
           <div className="flex gap-3">
-            <button type="button" onClick={() => setShowForm(false)} className="btn-secondary flex-1">Ghairi</button>
+            <button type="button" onClick={() => setShowForm(false)} className="btn-secondary flex-1">Cancel</button>
             <button type="submit" disabled={isSubmitting} className="btn-primary flex-1">
-              {isSubmitting ? "Inaongeza..." : "Ongeza Mfanyakazi"}
+              {isSubmitting ? "Adding..." : "Add Staff Member"}
             </button>
           </div>
         </form>
@@ -131,7 +131,7 @@ export default function StaffPage() {
             </div>
             <div className="flex items-center gap-2">
               <span className={`badge ${user.role === "ADMIN" ? "badge-purple" : "badge-blue"}`}>
-                {user.role === "ADMIN" ? "Msimamizi" : "Mhudumu"}
+                {user.role === "ADMIN" ? "Admin" : "Staff"}
               </span>
               <button
                 onClick={() => toggleActive(user.id as string, user.isActive as boolean)}

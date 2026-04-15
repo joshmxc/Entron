@@ -20,25 +20,25 @@ export default function EventsPage() {
   return (
     <div>
       <div className="page-header">
-        <h1 className="page-title">Matukio</h1>
+        <h1 className="page-title">Events</h1>
         {isAdmin && (
           <Link href="/events/new" className="btn-primary">
-            <Plus className="w-4 h-4" /> Tukio Jipya
+            <Plus className="w-4 h-4" /> New Event
           </Link>
         )}
       </div>
 
       {isLoading && (
-        <div className="text-slate-400 text-center py-12">Inapakia...</div>
+        <div className="text-slate-400 text-center py-12">Loading...</div>
       )}
 
       {!isLoading && events.length === 0 && (
         <div className="card text-center py-12">
           <Calendar className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-          <p className="text-slate-400">Hakuna matukio bado</p>
+          <p className="text-slate-400">No events yet</p>
           {isAdmin && (
             <Link href="/events/new" className="btn-primary mt-4 inline-flex">
-              <Plus className="w-4 h-4" /> Unda Tukio la Kwanza
+              <Plus className="w-4 h-4" /> Create First Event
             </Link>
           )}
         </div>
@@ -62,7 +62,7 @@ export default function EventsPage() {
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="font-semibold text-slate-100 truncate">{event.name as string}</h3>
                   <span className={`badge ${event.isActive ? "badge-green" : "badge-red"}`}>
-                    {event.isActive ? "Inafanya Kazi" : "Imefungwa"}
+                    {event.isActive ? "Active" : "Closed"}
                   </span>
                 </div>
                 <div className="flex items-center gap-1 text-sm text-slate-400 mb-2">
@@ -76,7 +76,7 @@ export default function EventsPage() {
                   </span>
                   <span className="flex items-center gap-1">
                     <Users className="w-3 h-3" />
-                    {(event._count as Record<string, number>)?.guests ?? 0} wageni
+                    {(event._count as Record<string, number>)?.guests ?? 0} guests
                   </span>
                 </div>
               </div>

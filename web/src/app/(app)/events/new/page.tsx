@@ -8,12 +8,10 @@ import Link from "next/link";
 import api from "@/lib/api";
 
 const schema = z.object({
-  name: z.string().min(1, "Jina linahitajika"),
-  nameSwahili: z.string().optional(),
-  venue: z.string().min(1, "Mahali panahitajika"),
-  venueSwahili: z.string().optional(),
+  name: z.string().min(1, "Event name is required"),
+  venue: z.string().min(1, "Venue is required"),
   description: z.string().optional(),
-  startDate: z.string().min(1, "Tarehe inahitajika"),
+  startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().optional(),
 });
 
@@ -40,55 +38,43 @@ export default function NewEventPage() {
         <Link href="/events" className="text-slate-400 hover:text-slate-100">
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <h1 className="page-title">Tukio Jipya</h1>
+        <h1 className="page-title">New Event</h1>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="card space-y-4">
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="input-group">
-            <label>Jina la Tukio *</label>
-            <input {...register("name")} placeholder="Harusi ya Amani" />
-            {errors.name && <p className="text-red-400 text-xs">{errors.name.message}</p>}
-          </div>
-          <div className="input-group">
-            <label>Jina kwa Kiswahili</label>
-            <input {...register("nameSwahili")} placeholder="Harusi ya Amani" />
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="input-group">
-            <label>Mahali *</label>
-            <input {...register("venue")} placeholder="Mlimani City Hall" />
-            {errors.venue && <p className="text-red-400 text-xs">{errors.venue.message}</p>}
-          </div>
-          <div className="input-group">
-            <label>Mahali kwa Kiswahili</label>
-            <input {...register("venueSwahili")} placeholder="Ukumbi wa Mlimani" />
-          </div>
+        <div className="input-group">
+          <label>Event Name *</label>
+          <input {...register("name")} placeholder="Annual Gala 2026" />
+          {errors.name && <p className="text-red-400 text-xs">{errors.name.message}</p>}
         </div>
 
         <div className="input-group">
-          <label>Maelezo</label>
-          <textarea {...register("description")} rows={3} placeholder="Maelezo ya tukio..." />
+          <label>Venue *</label>
+          <input {...register("venue")} placeholder="Grand Ballroom, City Hotel" />
+          {errors.venue && <p className="text-red-400 text-xs">{errors.venue.message}</p>}
+        </div>
+
+        <div className="input-group">
+          <label>Description</label>
+          <textarea {...register("description")} rows={3} placeholder="Event description..." />
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
           <div className="input-group">
-            <label>Tarehe ya Kuanza *</label>
+            <label>Start Date *</label>
             <input type="datetime-local" {...register("startDate")} />
             {errors.startDate && <p className="text-red-400 text-xs">{errors.startDate.message}</p>}
           </div>
           <div className="input-group">
-            <label>Tarehe ya Kuisha</label>
+            <label>End Date</label>
             <input type="datetime-local" {...register("endDate")} />
           </div>
         </div>
 
         <div className="flex gap-3 pt-2">
-          <Link href="/events" className="btn-secondary flex-1 text-center">Ghairi</Link>
+          <Link href="/events" className="btn-secondary flex-1 text-center">Cancel</Link>
           <button type="submit" disabled={isSubmitting} className="btn-primary flex-1">
-            {isSubmitting ? "Inahifadhi..." : "Hifadhi Tukio"}
+            {isSubmitting ? "Saving..." : "Save Event"}
           </button>
         </div>
       </form>

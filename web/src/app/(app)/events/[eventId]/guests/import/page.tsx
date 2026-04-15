@@ -1,6 +1,5 @@
 "use client";
 import { use, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
 import Link from "next/link";
 import { ArrowLeft, Upload, FileSpreadsheet, CheckCircle, AlertCircle } from "lucide-react";
@@ -8,7 +7,6 @@ import api from "@/lib/api";
 
 export default function ImportPage({ params }: { params: Promise<{ eventId: string }> }) {
   const { eventId } = use(params);
-  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<{ imported: number; skipped: number; errors: Array<{ row: number; message: string }> } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,7 +36,7 @@ export default function ImportPage({ params }: { params: Promise<{ eventId: stri
       });
       setResult(res.data.data);
     } catch {
-      alert("Imeshindwa kuingiza faili");
+      alert("Failed to import file");
     } finally {
       setLoading(false);
     }
@@ -50,16 +48,16 @@ export default function ImportPage({ params }: { params: Promise<{ eventId: stri
         <Link href={`/events/${eventId}/guests`} className="text-slate-400 hover:text-slate-100">
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <h1 className="page-title">Ingiza Wageni kutoka Excel</h1>
+        <h1 className="page-title">Import Guests from Excel</h1>
       </div>
 
       {/* Template info */}
       <div className="card mb-4 text-sm text-slate-300 space-y-1">
-        <p className="font-medium text-slate-200 mb-2">Muundo wa safu za Excel (row 1 = kichwa):</p>
+        <p className="font-medium text-slate-200 mb-2">Excel column format (row 1 = header):</p>
         <code className="text-xs text-entron-blue block overflow-x-auto whitespace-nowrap">
           firstName | lastName | phone | email | guestType | maxAdmissions | tableNumber | seatNumber | notes
         </code>
-        <p className="text-xs text-slate-500 mt-1">guestType: SINGLE, DOUBLE, FAMILY, au VIP</p>
+        <p className="text-xs text-slate-500 mt-1">guestType: SINGLE, DOUBLE, FAMILY, or VIP</p>
       </div>
 
       {!result ? (
@@ -76,17 +74,17 @@ export default function ImportPage({ params }: { params: Promise<{ eventId: stri
               <p className="text-slate-200 font-medium">{file.name}</p>
             ) : (
               <>
-                <p className="text-slate-300">Buruta faili hapa au bonyeza kuchagua</p>
+                <p className="text-slate-300">Drag file here or click to select</p>
                 <p className="text-slate-500 text-sm mt-1">.xlsx, .xls, .csv</p>
               </>
             )}
           </div>
 
           <div className="flex gap-3 mt-4">
-            <Link href={`/events/${eventId}/guests`} className="btn-secondary flex-1 text-center">Ghairi</Link>
+            <Link href={`/events/${eventId}/guests`} className="btn-secondary flex-1 text-center">Cancel</Link>
             <button onClick={handleImport} disabled={!file || loading} className="btn-primary flex-1">
               <Upload className="w-4 h-4" />
-              {loading ? "Inaingiza..." : "Ingiza Wageni"}
+              {loading ? "Importing..." : "Import Guests"}
             </button>
           </div>
         </>
@@ -94,19 +92,19 @@ export default function ImportPage({ params }: { params: Promise<{ eventId: stri
         <div className="space-y-4">
           <div className="card border-green-700/50">
             <CheckCircle className="w-8 h-8 text-blue-400 mb-3" />
-            <p className="text-xl font-bold text-blue-400">{result.imported} waliingizwa</p>
-            {result.skipped > 0 && <p className="text-slate-400 text-sm">{result.skipped} walirukwa</p>}
+            <p className="text-xl font-bold text-blue-400">{result.imported} imported</p>
+            {result.skipped > 0 && <p className="text-slate-400 text-sm">{result.skipped} skipped</p>}
           </div>
 
           {result.errors.length > 0 && (
             <div className="card border-red-700/50">
               <div className="flex items-center gap-2 mb-3">
                 <AlertCircle className="w-5 h-5 text-red-400" />
-                <p className="font-medium text-slate-200">Makosa ({result.errors.length})</p>
+                <p className="font-medium text-slate-200">Errors ({result.errors.length})</p>
               </div>
               <div className="space-y-1 max-h-48 overflow-y-auto">
                 {result.errors.map((e, i) => (
-                  <p key={i} className="text-xs text-red-400">Safu {e.row}: {e.message}</p>
+                  <p key={i} className="text-xs text-red-400">Row {e.row}: {e.message}</p>
                 ))}
               </div>
             </div>
@@ -114,10 +112,10 @@ export default function ImportPage({ params }: { params: Promise<{ eventId: stri
 
           <div className="flex gap-3">
             <button onClick={() => { setFile(null); setResult(null); }} className="btn-secondary flex-1">
-              Ingiza Zaidi
+              Import More
             </button>
             <Link href={`/events/${eventId}/guests`} className="btn-primary flex-1 text-center">
-              Angalia Wageni
+              View Guests
             </Link>
           </div>
         </div>

@@ -18,7 +18,7 @@ type FormData = z.infer<typeof schema>;
 export default function SettingsPage() {
   const { user, clear } = useAuthStore();
   const router = useRouter();
-  const [lang, setLang] = useState(user?.language ?? "sw");
+  const [lang, setLang] = useState(user?.language ?? "en");
   const [msg, setMsg] = useState("");
 
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
@@ -29,9 +29,9 @@ export default function SettingsPage() {
     try {
       await api.patch(`/users/${user?.id}`, { password: data.newPassword });
       reset();
-      setMsg("Nenosiri limebadilishwa kikamilifu!");
+      setMsg("Password changed successfully!");
     } catch {
-      setMsg("Imeshindwa kubadilisha nenosiri");
+      setMsg("Failed to change password");
     }
   };
 
@@ -52,19 +52,19 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="page-title">Mipangilio</h1>
+      <h1 className="page-title">Settings</h1>
 
       {/* Profile */}
       <div className="card">
-        <h2 className="font-semibold text-slate-200 mb-4">Taarifa za Akaunti</h2>
+        <h2 className="font-semibold text-slate-200 mb-4">Account Info</h2>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-slate-400">Jina</span>
+            <span className="text-slate-400">Name</span>
             <span className="text-slate-200">{user?.name}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-400">Wadhifa</span>
-            <span className="text-slate-200">{user?.role === "ADMIN" ? "Msimamizi" : "Mhudumu"}</span>
+            <span className="text-slate-400">Role</span>
+            <span className="text-slate-200">{user?.role === "ADMIN" ? "Admin" : "Staff"}</span>
           </div>
         </div>
       </div>
@@ -72,12 +72,12 @@ export default function SettingsPage() {
       {/* Language */}
       <div className="card">
         <h2 className="font-semibold text-slate-200 mb-4 flex items-center gap-2">
-          <Globe className="w-4 h-4" /> Lugha / Language
+          <Globe className="w-4 h-4" /> Language
         </h2>
         <div className="flex gap-3">
           {[
-            { code: "sw", label: "Kiswahili" },
             { code: "en", label: "English" },
+            { code: "sw", label: "Kiswahili" },
           ].map(({ code, label }) => (
             <button
               key={code}
@@ -97,35 +97,35 @@ export default function SettingsPage() {
       {/* Change password */}
       <div className="card">
         <h2 className="font-semibold text-slate-200 mb-4 flex items-center gap-2">
-          <Lock className="w-4 h-4" /> Badilisha Nenosiri
+          <Lock className="w-4 h-4" /> Change Password
         </h2>
         {msg && (
           <div className={`px-3 py-2 rounded-lg text-sm mb-4 ${
-            msg.includes("kikamilifu") ? "bg-green-900/50 text-green-300" : "bg-red-900/50 text-red-300"
+            msg.includes("successfully") ? "bg-green-900/50 text-green-300" : "bg-red-900/50 text-red-300"
           }`}>
             {msg}
           </div>
         )}
         <form onSubmit={handleSubmit(onChangePassword)} className="space-y-4">
           <div className="input-group">
-            <label>Nenosiri la Sasa</label>
+            <label>Current Password</label>
             <input {...register("currentPassword")} type="password" />
             {errors.currentPassword && <p className="text-red-400 text-xs">{errors.currentPassword.message}</p>}
           </div>
           <div className="input-group">
-            <label>Nenosiri Jipya</label>
+            <label>New Password</label>
             <input {...register("newPassword")} type="password" />
             {errors.newPassword && <p className="text-red-400 text-xs">{errors.newPassword.message}</p>}
           </div>
           <button type="submit" disabled={isSubmitting} className="btn-primary w-full">
-            {isSubmitting ? "Inabadilisha..." : "Badilisha Nenosiri"}
+            {isSubmitting ? "Saving..." : "Change Password"}
           </button>
         </form>
       </div>
 
       {/* Logout */}
       <button onClick={handleLogout} className="w-full btn-danger flex items-center justify-center gap-2">
-        <LogOut className="w-4 h-4" /> Toka kwenye Akaunti
+        <LogOut className="w-4 h-4" /> Log Out
       </button>
     </div>
   );

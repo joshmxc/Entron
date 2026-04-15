@@ -10,18 +10,18 @@ export default function InvitationsPage() {
     return (
       <div className="text-center py-16">
         <Mail className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-        <p className="text-slate-400 mb-2">Chagua tukio kwanza</p>
-        <Link href="/events" className="btn-primary inline-flex">Nenda kwa Matukio</Link>
+        <p className="text-slate-400 mb-2">Select an event first</p>
+        <Link href="/events" className="btn-primary inline-flex">Go to Events</Link>
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="page-title mb-2">Mialiko</h1>
-      <p className="text-slate-400 mb-6">Tukio: {activeEvent.name}</p>
+      <h1 className="page-title mb-2">Invitations</h1>
+      <p className="text-slate-400 mb-6">Event: {activeEvent.name}</p>
       <Link href={`/events/${activeEvent.id}/invitations`} className="btn-primary">
-        Simamia Mialiko ya {activeEvent.name}
+        Manage Invitations for {activeEvent.name}
       </Link>
     </div>
   );
