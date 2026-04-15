@@ -3,7 +3,7 @@ import { use, useState, useRef, useCallback, useEffect } from "react";
 import useSWR from "swr";
 import Link from "next/link";
 import {
-  ArrowLeft, Upload, Download, Send, Trash2,
+  ArrowLeft, Download, Send,
   Move, Type, QrCode, Check, RefreshCw, ImageIcon, X, FileSpreadsheet, Loader2,
 } from "lucide-react";
 import api from "@/lib/api";
@@ -24,10 +24,10 @@ const STATUS_COLORS: Record<string, string> = {
   DELIVERED: "badge-green", READ: "badge-purple", FAILED: "badge-red",
 };
 const STATUS_LABELS: Record<string, string> = {
-  PENDING: "Inasubiri", SENT: "Imetumwa",
-  DELIVERED: "Imepokelewa", READ: "Imesomwa", FAILED: "Imeshindwa",
+  PENDING: "Pending", SENT: "Sent",
+  DELIVERED: "Delivered", READ: "Read", FAILED: "Failed",
 };
-const TYPE_LABEL: Record<string, string> = { SINGLE: "Mmoja", DOUBLE: "Wawili", FAMILY: "Familia", VIP: "VIP" };
+const TYPE_LABEL: Record<string, string> = { SINGLE: "Single", DOUBLE: "Double", FAMILY: "Family", VIP: "VIP" };
 const TYPE_COLOR: Record<string, string> = { SINGLE: "badge-blue", DOUBLE: "badge-purple", FAMILY: "badge-green", VIP: "badge-yellow" };
 
 // ─── Template Designer ─────────────────────────────────────────────────────
@@ -75,7 +75,7 @@ function TemplateDesigner({
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-slate-400">Buruta alama kwenye picha kuweka nafasi</p>
+      <p className="text-xs text-slate-400">Drag handles on the image to position elements</p>
       <div className="relative w-full rounded-xl overflow-hidden border border-entron-dark-border bg-slate-900 select-none">
         <img ref={imgRef} src={imageUrl} alt="template" className="w-full block" draggable={false}
           onLoad={(e) => setNatural({ w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })} />
@@ -89,7 +89,7 @@ function TemplateDesigner({
             drag.current = { key: "guestName", sx: e.clientX, sy: e.clientY, ox: fields.guestName.x, oy: fields.guestName.y };
           }}>
           <Type className="w-3.5 h-3.5 text-entron-blue shrink-0" />
-          <span className="text-xs font-medium whitespace-nowrap">Jina</span>
+          <span className="text-xs font-medium whitespace-nowrap">Name</span>
           <Move className="w-3 h-3 text-slate-300 shrink-0" />
         </div>
 
@@ -111,10 +111,10 @@ function TemplateDesigner({
       <div className="grid sm:grid-cols-2 gap-3">
         <div className="card space-y-3">
           <p className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-            <Type className="w-4 h-4 text-entron-blue" /> Jina
+            <Type className="w-4 h-4 text-entron-blue" /> Guest Name
           </p>
           <div>
-            <label className="text-xs text-slate-400 mb-1 block">Ukubwa: {fields.guestName.size}px</label>
+            <label className="text-xs text-slate-400 mb-1 block">Size: {fields.guestName.size}px</label>
             <input type="range" min={16} max={120} value={fields.guestName.size} className="w-full accent-entron-blue"
               onChange={(e) => onChange({ ...fields, guestName: { ...fields.guestName, size: +e.target.value } })} />
           </div>
@@ -130,7 +130,7 @@ function TemplateDesigner({
             <QrCode className="w-4 h-4 text-blue-400" /> QR Code
           </p>
           <div>
-            <label className="text-xs text-slate-400 mb-1 block">Ukubwa: {fields.qrCode.size}px</label>
+            <label className="text-xs text-slate-400 mb-1 block">Size: {fields.qrCode.size}px</label>
             <input type="range" min={80} max={400} value={fields.qrCode.size} className="w-full accent-blue-400"
               onChange={(e) => onChange({ ...fields, qrCode: { ...fields.qrCode, size: +e.target.value } })} />
           </div>
@@ -151,28 +151,18 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
   const guests: Record<string, unknown>[] = invData?.data ?? [];
   const template = templates[0] ?? null;
 
-  // ── Step states ──
   const [step, setStep] = useState<"template" | "excel" | "done">("template");
-
-  // ── Template designer ──
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [fields, setFields] = useState<Fields>(DEFAULT_FIELDS);
   const [savingTemplate, setSavingTemplate] = useState(false);
-
-  // ── Excel import ──
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<{ imported: number; skipped: number } | null>(null);
-
-  // ── Card generation ──
   const [generating, setGenerating] = useState(false);
   const [genResult, setGenResult] = useState<{ generated: number; failed: number } | null>(null);
-
-  // ── WhatsApp ──
-  const [message, setMessage] = useState("Karibu {{name}}! Tunafurahi kukualika kwenye tukio letu.");
+  const [message, setMessage] = useState("Hello {{name}}! We are pleased to invite you to our event.");
   const [sending, setSending] = useState(false);
 
-  // Sync step from data
   useEffect(() => {
     if (template && guests.length > 0) setStep("done");
     else if (template) setStep("excel");
@@ -219,7 +209,6 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
       const { imported, skipped } = res.data.data;
       setImportResult({ imported, skipped });
       await mutateInv();
-      // Auto-generate cards immediately
       await generateCards();
     } finally {
       setImporting(false);
@@ -253,7 +242,7 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
         .filter((g) => (g.invitations as Array<Record<string, unknown>>)?.[0]?.cardUrl)
         .map((g) => g.id as string);
       const res = await api.post(`/events/${eventId}/whatsapp/send-bulk`, { guestIds, message, includeCard: true });
-      alert(`Zimetumwa: ${res.data.data.sent}, Zimeshindwa: ${res.data.data.failed}`);
+      alert(`Sent: ${res.data.data.sent}, Failed: ${res.data.data.failed}`);
     } finally {
       setSending(false);
     }
@@ -268,7 +257,7 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
         <Link href={`/events/${eventId}`} className="text-slate-400 hover:text-slate-100">
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <h1 className="page-title flex-1">Mialiko</h1>
+        <h1 className="page-title flex-1">Invitations</h1>
         {cardsReady.length > 0 && (
           <a href={`/api/v1/events/${eventId}/invitations/download-zip`} className="btn-secondary text-sm">
             <Download className="w-4 h-4" /> ZIP ({cardsReady.length})
@@ -281,34 +270,32 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-slate-200 flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-entron-blue text-white text-xs flex items-center justify-center font-bold">1</span>
-            Pakia Templeti ya Kadi
+            Upload Card Template
           </h2>
           {template && step !== "template" && (
             <button onClick={() => openEditor(template)} className="btn-secondary text-xs">
-              <Move className="w-3.5 h-3.5" /> Hariri
+              <Move className="w-3.5 h-3.5" /> Edit
             </button>
           )}
         </div>
 
-        {/* No template yet — dropzone */}
         {!template && !previewUrl && (
           <label className="flex flex-col items-center justify-center border-2 border-dashed border-entron-dark-border rounded-xl py-10 cursor-pointer hover:border-entron-blue/50 transition-colors">
             <ImageIcon className="w-10 h-10 text-slate-500 mb-3" />
-            <p className="text-slate-300 font-medium">Bonyeza kupakia picha ya templeti</p>
-            <p className="text-slate-500 text-sm mt-1">PNG au JPG — muundo wa kadi yako</p>
+            <p className="text-slate-300 font-medium">Click to upload a template image</p>
+            <p className="text-slate-500 text-sm mt-1">PNG or JPG — your card design</p>
             <input type="file" accept="image/*" className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; setPendingFile(f); setPreviewUrl(URL.createObjectURL(f)); }} />
           </label>
         )}
 
-        {/* Designer open */}
         {previewUrl && step === "template" && (
           <div className="space-y-4">
             <TemplateDesigner imageUrl={previewUrl} fields={fields} onChange={setFields} />
             <div className="flex gap-3">
               <button onClick={saveTemplate} disabled={savingTemplate} className="btn-primary flex-1">
                 <Check className="w-4 h-4" />
-                {savingTemplate ? "Inahifadhi..." : "Hifadhi na Endelea"}
+                {savingTemplate ? "Saving..." : "Save & Continue"}
               </button>
               {template && (
                 <button onClick={() => { setPreviewUrl(null); setPendingFile(null); setStep("excel"); }} className="btn-secondary">
@@ -319,17 +306,16 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
           </div>
         )}
 
-        {/* Template saved — compact preview */}
         {template && step !== "template" && (
           <div className="flex items-center gap-3">
             <img src={template.fileUrl} alt="template" className="w-20 h-auto rounded-lg border border-entron-dark-border object-cover" />
             <div className="text-sm space-y-1">
               <p className="text-slate-200 font-medium">{template.name}</p>
               <p className="text-xs text-slate-500">
-                Jina: x={template.fields?.guestName?.x}, y={template.fields?.guestName?.y} · QR: x={template.fields?.qrCode?.x}, y={template.fields?.qrCode?.y}
+                Name: x={template.fields?.guestName?.x}, y={template.fields?.guestName?.y} · QR: x={template.fields?.qrCode?.x}, y={template.fields?.qrCode?.y}
               </p>
               <span className="badge badge-green text-xs flex items-center gap-1 w-fit">
-                <Check className="w-3 h-3" /> Imehifadhiwa
+                <Check className="w-3 h-3" /> Saved
               </span>
             </div>
           </div>
@@ -341,22 +327,21 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
         <div className={`card space-y-4 ${step === "excel" ? "ring-2 ring-entron-blue/40" : ""}`}>
           <h2 className="font-semibold text-slate-200 flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-entron-blue text-white text-xs flex items-center justify-center font-bold">2</span>
-            Pakia Faili ya Excel (Wageni)
+            Upload Guest Excel File
           </h2>
 
-          {/* Column guide */}
           <div className="bg-slate-800/60 rounded-lg p-3 text-xs text-slate-400 space-y-1">
-            <p className="font-medium text-slate-300 mb-2">Safu zinazohitajika kwenye Excel:</p>
+            <p className="font-medium text-slate-300 mb-2">Required Excel columns:</p>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
               {[
-                ["firstName", "Jina la kwanza (lazima)"],
-                ["lastName", "Jina la ukoo (lazima)"],
-                ["phone", "Nambari ya simu"],
+                ["firstName", "First name (required)"],
+                ["lastName", "Last name (required)"],
+                ["phone", "Phone number"],
                 ["guestType", "SINGLE / DOUBLE / FAMILY / VIP"],
-                ["tableNumber", "Nambari ya meza"],
-                ["seatNumber", "Nambari ya kiti"],
-                ["email", "Barua pepe"],
-                ["notes", "Maelezo"],
+                ["tableNumber", "Table number"],
+                ["seatNumber", "Seat number"],
+                ["email", "Email address"],
+                ["notes", "Notes"],
               ].map(([col, desc]) => (
                 <div key={col} className="flex gap-1.5">
                   <span className="font-mono text-entron-blue">{col}</span>
@@ -366,31 +351,29 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
             </div>
           </div>
 
-          {/* Import result */}
           {importResult && (
             <div className="bg-green-900/30 border border-green-700/50 rounded-lg px-4 py-3 text-sm flex items-center gap-3">
               <Check className="w-5 h-5 text-blue-400 shrink-0" />
               <span className="text-green-300">
-                Wageni <strong>{importResult.imported}</strong> wameingizwa.
-                {importResult.skipped > 0 && ` (${importResult.skipped} wamerukwa)`}
+                <strong>{importResult.imported}</strong> guests imported.
+                {importResult.skipped > 0 && ` (${importResult.skipped} skipped)`}
               </span>
             </div>
           )}
 
-          {/* Drop zone */}
           <label className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl py-8 cursor-pointer transition-colors ${importing ? "border-entron-blue/50 bg-entron-blue/5" : "border-entron-dark-border hover:border-entron-blue/50"}`}>
             {importing ? (
               <>
                 <Loader2 className="w-8 h-8 text-entron-blue animate-spin mb-2" />
-                <p className="text-slate-300 text-sm">Inaingiza wageni na kuunda kadi...</p>
+                <p className="text-slate-300 text-sm">Importing guests and generating cards...</p>
               </>
             ) : (
               <>
                 <FileSpreadsheet className="w-10 h-10 text-slate-500 mb-3" />
-                <p className="text-slate-300 font-medium">Bonyeza kupakia Excel</p>
-                <p className="text-slate-500 text-sm mt-1">.xlsx au .xls</p>
+                <p className="text-slate-300 font-medium">Click to upload Excel</p>
+                <p className="text-slate-500 text-sm mt-1">.xlsx or .xls</p>
                 {guests.length > 0 && (
-                  <p className="text-xs text-slate-500 mt-2">Wageni wa sasa: {guests.length} — faili mpya itaongeza zaidi</p>
+                  <p className="text-xs text-slate-500 mt-2">Current guests: {guests.length} — new file will add more</p>
                 )}
               </>
             )}
@@ -398,16 +381,15 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
               onChange={(e) => { const f = e.target.files?.[0]; if (f) importExcel(f); }} />
           </label>
 
-          {/* Manual regenerate if guests exist */}
           {guests.length > 0 && !importing && (
             <div className="flex items-center gap-3 pt-1">
               <button onClick={generateCards} disabled={generating} className="btn-secondary text-sm">
                 {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                {generating ? "Inaunda kadi..." : `Tengeneza Kadi Tena (${guests.length})`}
+                {generating ? "Generating cards..." : `Regenerate Cards (${guests.length})`}
               </button>
               {genResult && (
                 <span className="text-xs text-slate-400">
-                  {genResult.generated} zimeundwa, {genResult.failed} zimeshindwa
+                  {genResult.generated} generated, {genResult.failed} failed
                 </span>
               )}
             </div>
@@ -421,10 +403,10 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
           <div className="flex items-center justify-between">
             <h2 className="font-semibold text-slate-200 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-entron-blue text-white text-xs flex items-center justify-center font-bold">3</span>
-              Kadi Tayari ({cardsReady.length}/{guests.length})
+              Cards Ready ({cardsReady.length}/{guests.length})
             </h2>
             <a href={`/api/v1/events/${eventId}/invitations/download-zip`} className="btn-secondary text-xs">
-              <Download className="w-3.5 h-3.5" /> Pakua Zote
+              <Download className="w-3.5 h-3.5" /> Download All
             </a>
           </div>
 
@@ -440,7 +422,7 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2">
                     <a href={cardUrl} download={`${g.firstName}-${g.lastName}.jpg`}
                       className="btn-primary text-xs w-full justify-center">
-                      <Download className="w-3.5 h-3.5" /> Pakua
+                      <Download className="w-3.5 h-3.5" /> Download
                     </a>
                   </div>
                   <div className="p-2 space-y-1">
@@ -461,15 +443,15 @@ export default function InvitationsPage({ params }: { params: Promise<{ eventId:
       {cardsReady.length > 0 && (
         <div className="card space-y-4">
           <h2 className="font-semibold text-slate-200 flex items-center gap-2">
-            <Send className="w-4 h-4 text-entron-blue" /> Tuma WhatsApp
+            <Send className="w-4 h-4 text-entron-blue" /> Send via WhatsApp
           </h2>
           <div className="input-group">
-            <label>Ujumbe (tumia {"{{name}}"} kwa jina la mgeni)</label>
+            <label>Message (use {"{{name}}"} for guest name)</label>
             <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={3} className="text-sm" />
           </div>
           <button onClick={sendBulk} disabled={sending} className="btn-primary w-full">
             <Send className="w-4 h-4" />
-            {sending ? "Inatuma..." : `Tuma kwa Wageni Wote (${cardsReady.length})`}
+            {sending ? "Sending..." : `Send to All Guests (${cardsReady.length})`}
           </button>
         </div>
       )}

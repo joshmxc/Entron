@@ -4,7 +4,7 @@ import useSWR from "swr";
 import Link from "next/link";
 import {
   ArrowLeft, Send, MessageSquare, Phone, CheckCircle2,
-  XCircle, Clock, Search, Users, User, Filter,
+  XCircle, Clock, Search, Users, User,
 } from "lucide-react";
 import api from "@/lib/api";
 
@@ -16,10 +16,10 @@ type GuestType = "SINGLE" | "DOUBLE" | "FAMILY" | "VIP";
 const CHANNEL_OPTIONS: { value: Channel; label: string; icon: React.ReactNode; color: string }[] = [
   { value: "WHATSAPP", label: "WhatsApp", icon: <MessageSquare className="w-4 h-4" />, color: "border-green-500 bg-blue-500/10 text-blue-400" },
   { value: "SMS",       label: "SMS",      icon: <Phone className="w-4 h-4" />,          color: "border-blue-500 bg-blue-500/10 text-blue-400" },
-  { value: "BOTH",      label: "Vyote Viwili", icon: <Send className="w-4 h-4" />,       color: "border-purple-500 bg-purple-500/10 text-purple-400" },
+  { value: "BOTH",      label: "SMS + WhatsApp", icon: <Send className="w-4 h-4" />,     color: "border-purple-500 bg-purple-500/10 text-purple-400" },
 ];
 
-const TYPE_LABEL: Record<GuestType, string> = { SINGLE: "Mmoja", DOUBLE: "Wawili", FAMILY: "Familia", VIP: "VIP" };
+const TYPE_LABEL: Record<GuestType, string> = { SINGLE: "Single", DOUBLE: "Double", FAMILY: "Family", VIP: "VIP" };
 const TYPE_COLOR: Record<GuestType, string> = { SINGLE: "badge-blue", DOUBLE: "badge-purple", FAMILY: "badge-green", VIP: "badge-yellow" };
 
 const MSG_STATUS_ICON: Record<string, React.ReactNode> = {
@@ -99,9 +99,9 @@ export default function MessagesPage({ params }: { params: Promise<{ eventId: st
         <Link href={`/events/${eventId}`} className="text-slate-400 hover:text-slate-100">
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <h1 className="page-title flex-1">Ujumbe</h1>
+        <h1 className="page-title flex-1">Messages</h1>
         <div className="flex items-center gap-3 text-xs text-slate-500">
-          <span>{guestsWithPhone}/{guests.length} wana nambari</span>
+          <span>{guestsWithPhone}/{guests.length} with phone</span>
           {smsBalance && (
             <span className="badge badge-green">SMS: {smsBalance.display}</span>
           )}
@@ -111,8 +111,8 @@ export default function MessagesPage({ params }: { params: Promise<{ eventId: st
       {/* Tabs */}
       <div className="flex border-b border-entron-dark-border">
         {[
-          { key: "compose", label: "Tunga Ujumbe", icon: <Send className="w-4 h-4" /> },
-          { key: "history", label: "Historia", icon: <MessageSquare className="w-4 h-4" /> },
+          { key: "compose", label: "Compose", icon: <Send className="w-4 h-4" /> },
+          { key: "history", label: "History", icon: <MessageSquare className="w-4 h-4" /> },
         ].map(({ key, label, icon }) => (
           <button key={key} onClick={() => setTab(key as typeof tab)}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${tab === key ? "border-entron-blue text-entron-blue" : "border-transparent text-slate-400 hover:text-slate-200"}`}>
@@ -127,7 +127,7 @@ export default function MessagesPage({ params }: { params: Promise<{ eventId: st
 
           {/* Channel selector */}
           <div className="card space-y-3">
-            <h2 className="font-semibold text-slate-200 text-sm">Njia ya Kutuma</h2>
+            <h2 className="font-semibold text-slate-200 text-sm">Send via</h2>
             <div className="grid grid-cols-3 gap-3">
               {CHANNEL_OPTIONS.map(({ value, label, icon, color }) => (
                 <button key={value} onClick={() => setChannel(value)}
@@ -139,12 +139,12 @@ export default function MessagesPage({ params }: { params: Promise<{ eventId: st
             </div>
             {channel === "SMS" && (
               <p className="text-xs text-slate-500">
-                Itatumia Africa&apos;s Talking SMS. Hakikisha nambari za simu zina nchi (255...).
+                Uses Africa&apos;s Talking SMS. Make sure phone numbers include country code (e.g. 255...).
               </p>
             )}
             {channel === "BOTH" && (
               <p className="text-xs text-slate-500">
-                Kila mgeni atapokea WhatsApp na SMS zote mbili.
+                Each guest will receive both WhatsApp and SMS messages.
               </p>
             )}
           </div>
@@ -152,13 +152,13 @@ export default function MessagesPage({ params }: { params: Promise<{ eventId: st
           {/* Recipients */}
           <div className="card space-y-3">
             <h2 className="font-semibold text-slate-200 text-sm flex items-center gap-2">
-              <Users className="w-4 h-4 text-entron-blue" /> Wapokeaji
+              <Users className="w-4 h-4 text-entron-blue" /> Recipients
             </h2>
             <div className="flex gap-2 flex-wrap">
               {[
-                { mode: "all",    label: `Wageni Wote (${guests.length})` },
-                { mode: "type",   label: "Chagua Aina" },
-                { mode: "select", label: "Chagua Mmoja Mmoja" },
+                { mode: "all",    label: `All Guests (${guests.length})` },
+                { mode: "type",   label: "By Type" },
+                { mode: "select", label: "Pick Individually" },
               ].map(({ mode, label }) => (
                 <button key={mode} onClick={() => setRecipientMode(mode as typeof recipientMode)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${recipientMode === mode ? "border-entron-blue bg-entron-blue/10 text-entron-blue" : "border-entron-dark-border text-slate-400 hover:border-slate-500"}`}>
@@ -187,7 +187,7 @@ export default function MessagesPage({ params }: { params: Promise<{ eventId: st
               <div className="space-y-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tafuta mgeni..."
+                  <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search guest..."
                     className="w-full pl-9 text-sm" />
                 </div>
                 <div className="max-h-48 overflow-y-auto space-y-1">
@@ -197,14 +197,14 @@ export default function MessagesPage({ params }: { params: Promise<{ eventId: st
                         className="rounded border-slate-600 accent-entron-blue" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-slate-200 truncate">{g.firstName} {g.lastName}</p>
-                        {g.phone ? <p className="text-xs text-slate-500">{g.phone}</p> : <p className="text-xs text-red-400">Hakuna nambari</p>}
+                        {g.phone ? <p className="text-xs text-slate-500">{g.phone}</p> : <p className="text-xs text-red-400">No phone</p>}
                       </div>
                       <span className={`badge text-xs ${TYPE_COLOR[g.guestType]}`}>{TYPE_LABEL[g.guestType]}</span>
                     </label>
                   ))}
                 </div>
                 {selectedIds.size > 0 && (
-                  <p className="text-xs text-entron-blue">{selectedIds.size} wamechaguliwa</p>
+                  <p className="text-xs text-entron-blue">{selectedIds.size} selected</p>
                 )}
               </div>
             )}
@@ -212,25 +212,25 @@ export default function MessagesPage({ params }: { params: Promise<{ eventId: st
             {/* Count summary */}
             <div className="flex items-center gap-2 pt-1 text-xs text-slate-400">
               <User className="w-3.5 h-3.5" />
-              <span>Ujumbe utatumwa kwa wageni <strong className="text-slate-200">{resolvedIds.length}</strong></span>
+              <span><strong className="text-slate-200">{resolvedIds.length}</strong> will receive this message</span>
             </div>
           </div>
 
           {/* Message composer */}
           <div className="card space-y-3">
-            <h2 className="font-semibold text-slate-200 text-sm">Ujumbe</h2>
+            <h2 className="font-semibold text-slate-200 text-sm">Message</h2>
             <div className="space-y-1">
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Andika ujumbe hapa...&#10;&#10;Unaweza kutumia:&#10;{{name}} — jina kamili&#10;{{firstName}} — jina la kwanza&#10;{{lastName}} — jina la ukoo"
+                placeholder={"Write your message here...\n\nYou can use:\n{{name}} — full name\n{{firstName}} — first name\n{{lastName}} — last name"}
                 rows={5}
                 className="text-sm w-full"
               />
               <div className="flex justify-between text-xs text-slate-500 px-1">
-                <span>Herufi: {charCount}</span>
+                <span>Characters: {charCount}</span>
                 {(channel === "SMS" || channel === "BOTH") && (
-                  <span>SMS: {smsPages} {smsPages === 1 ? "ukurasa" : "kurasa"} (~{smsPages * 160} herufi max)</span>
+                  <span>SMS: {smsPages} {smsPages === 1 ? "page" : "pages"} (~{smsPages * 160} chars max)</span>
                 )}
               </div>
             </div>
@@ -255,13 +255,13 @@ export default function MessagesPage({ params }: { params: Promise<{ eventId: st
                   : <XCircle className="w-5 h-5 text-yellow-400 shrink-0" />}
                 <div>
                   <p className="text-sm font-semibold text-slate-200">
-                    Zimetumwa: {sendResult.sent} · Zimeshindwa: {sendResult.failed}
+                    Sent: {sendResult.sent} · Failed: {sendResult.failed}
                   </p>
-                  <p className="text-xs text-slate-400">Tazama historia kwa maelezo zaidi</p>
+                  <p className="text-xs text-slate-400">See history for more details</p>
                 </div>
               </div>
               <div className="max-h-40 overflow-y-auto space-y-1">
-                {sendResult.details.filter((d) => d.status !== "Imetumwa").map((d, i) => (
+                {sendResult.details.filter((d) => d.status !== "Sent").map((d, i) => (
                   <div key={i} className="flex items-center gap-2 text-xs text-red-400">
                     <XCircle className="w-3.5 h-3.5 shrink-0" />
                     {d.name} ({d.phone}) — {d.status}
@@ -275,11 +275,11 @@ export default function MessagesPage({ params }: { params: Promise<{ eventId: st
           <button onClick={send} disabled={sending || !message.trim() || resolvedIds.length === 0}
             className="btn-primary w-full py-3">
             {sending ? (
-              <><span className="animate-pulse">Inatuma...</span></>
+              <><span className="animate-pulse">Sending...</span></>
             ) : (
               <>
                 <Send className="w-4 h-4" />
-                Tuma kwa {resolvedIds.length} {recipientMode !== "all" ? "waliochaguliwa" : "wageni wote"}
+                Send to {resolvedIds.length} {recipientMode !== "all" ? "selected" : "guests"}
                 {channel === "BOTH" ? " (WhatsApp + SMS)" : ` (${channel})`}
               </>
             )}
@@ -290,11 +290,11 @@ export default function MessagesPage({ params }: { params: Promise<{ eventId: st
       {/* ── HISTORY ── */}
       {tab === "history" && (
         <div className="card space-y-3">
-          <h2 className="font-semibold text-slate-200">Historia ya Ujumbe ({history.length})</h2>
+          <h2 className="font-semibold text-slate-200">Message History ({history.length})</h2>
           {history.length === 0 ? (
             <div className="text-center py-10 text-slate-500">
               <MessageSquare className="w-8 h-8 mx-auto mb-2" />
-              <p className="text-sm">Hakuna ujumbe uliotumwa bado</p>
+              <p className="text-sm">No messages sent yet</p>
             </div>
           ) : (
             <div className="space-y-2 max-h-[32rem] overflow-y-auto">
@@ -310,14 +310,14 @@ export default function MessagesPage({ params }: { params: Promise<{ eventId: st
                         {msg.channel === "WHATSAPP" ? "WhatsApp" : "SMS"}
                       </span>
                       <span className={`badge text-xs ${msg.status === "SENT" ? "badge-green" : msg.status === "FAILED" ? "badge-red" : "badge-yellow"}`}>
-                        {msg.status === "SENT" ? "Imetumwa" : msg.status === "FAILED" ? "Imeshindwa" : "Inasubiri"}
+                        {msg.status === "SENT" ? "Sent" : msg.status === "FAILED" ? "Failed" : "Pending"}
                       </span>
                     </div>
                     <p className="text-sm text-slate-300 line-clamp-2">{msg.body}</p>
                     <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
                       <span>{msg.sender?.name}</span>
                       <span>·</span>
-                      <span>{new Date(msg.createdAt).toLocaleString("sw-TZ", { dateStyle: "short", timeStyle: "short" })}</span>
+                      <span>{new Date(msg.createdAt).toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" })}</span>
                     </div>
                   </div>
                 </div>
